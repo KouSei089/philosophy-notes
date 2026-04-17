@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>私・ドゥルーズ・哲学者・概念の繋がりマップ</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background:#0f0f0f;color:#f0f0f0;overflow-x:hidden}
+
+/* header */
+.hdr{padding:14px 16px 10px;background:#1a1a1a;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.hdr h1{font-size:14px;font-weight:600;color:#e0e0e0}
+.hdr p{font-size:11px;color:#666;margin-top:2px}
+.legend{display:flex;gap:10px;flex-wrap:wrap}
+.leg{display:flex;align-items:center;gap:4px;font-size:10px;color:#888}
+.legdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* map container */
+.map-wrap{position:relative;width:100%;overflow:auto}
+#map{position:relative;min-width:900px;min-height:780px}
+#svg-layer{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+
+/* nodes */
+.node{position:absolute;transform:translate(-50%,-50%);cursor:pointer;transition:transform .15s,filter .15s;z-index:10}
+.node:hover{transform:translate(-50%,-50%) scale(1.07);filter:brightness(1.15)}
+.node.active{transform:translate(-50%,-50%) scale(1.1);filter:brightness(1.2)}
+.nbody{border-radius:20px;padding:6px 13px;font-size:12px;font-weight:600;border:2px solid;white-space:nowrap;text-align:center;line-height:1.4;box-shadow:0 2px 12px rgba(0,0,0,.5)}
+
+/* node types */
+.n-you .nbody{background:#0d2818;border-color:#22c55e;color:#86efac}
+.n-dlz .nbody{background:#2d1a02;border-color:#f59e0b;color:#fcd34d;font-size:13px;padding:8px 16px}
+.n-concept .nbody{background:#1a0a2e;border-color:#a78bfa;color:#ddd6fe}
+.n-phil .nbody{background:#0a1a2e;border-color:#60a5fa;color:#bfdbfe}
+.n-oppose .nbody{background:#2e0a0a;border-color:#f87171;color:#fecaca}
+.n-bridge .nbody{background:#0a1e1a;border-color:#34d399;color:#a7f3d0}
+
+/* center node special */
+.n-center .nbody{background:#1c1000;border-color:#f59e0b;color:#fcd34d;font-size:15px;font-weight:700;padding:12px 22px;border-width:3px;box-shadow:0 0 30px rgba(245,158,11,.3)}
+
+/* panel */
+.panel{position:fixed;bottom:0;left:0;right:0;background:#1a1a1a;border-top:2px solid #333;padding:16px;transform:translateY(100%);transition:transform .3s;z-index:200;max-height:45vh;overflow-y:auto}
+.panel.open{transform:translateY(0)}
+.panel-inner{max-width:700px;margin:0 auto}
+.panel-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.panel-name{font-size:16px;font-weight:700;color:#f0f0f0}
+.panel-type{font-size:11px;padding:2px 8px;border-radius:10px;margin-top:3px}
+.close-btn{background:none;border:none;color:#666;font-size:20px;cursor:pointer;padding:0 4px;line-height:1}
+.panel-body{font-size:13px;color:#aaa;line-height:1.8}
+.panel-section{margin-top:12px}
+.panel-slabel{font-size:10px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.conn-list{display:flex;flex-wrap:wrap;gap:5px}
+.conn-tag{font-size:11px;padding:3px 9px;border-radius:10px;background:#2a2a2a;color:#aaa;border:1px solid #333;cursor:pointer}
+.conn-tag:hover{border-color:#666;color:#ddd}
+.you-conn{border-color:#22c55e;color:#86efac;background:#0d2818}
+.dlz-conn{border-color:#f59e0b;color:#fcd34d;background:#2d1a02}
+.phil-conn{border-color:#60a5fa;color:#bfdbfe;background:#0a1a2e}
+.concept-conn{border-color:#a78bfa;color:#ddd6fe;background:#1a0a2e}
+
+/* filter bar */
+.filters{display:flex;gap:6px;padding:10px 16px;background:#141414;border-bottom:1px solid #222;overflow-x:auto;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.fbtn{flex-shrink:0;padding:5px 12px;border-radius:16px;border:1.5px solid #333;background:#1a1a1a;color:#888;font-size:11px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.fbtn:hover{border-color:#555;color:#ccc}
+.fbtn.on{color:#111}
+.fbtn-you.on{background:#22c55e;border-color:#22c55e}
+.fbtn-dlz.on{background:#f59e0b;border-color:#f59e0b}
+.fbtn-phil.on{background:#60a5fa;border-color:#60a5fa}
+.fbtn-oppose.on{background:#f87171;border-color:#f87171}
+.fbtn-concept.on{background:#a78bfa;border-color:#a78bfa}
+.fbtn-bridge.on{background:#34d399;border-color:#34d399}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <h1>私・ドゥルーズ・哲学者・概念の繋がりマップ</h1>
+    <p>ノードをタップ → 詳細と繋がりを表示</p>
+  </div>
+  <div class="legend">
+    <div class="leg"><div class="legdot" style="background:#22c55e"></div>あなた</div>
+    <div class="leg"><div class="legdot" style="background:#f59e0b"></div>ドゥルーズ概念</div>
+    <div class="leg"><div class="legdot" style="background:#60a5fa"></div>影響した哲学者</div>
+    <div class="leg"><div class="legdot" style="background:#f87171"></div>対抗軸</div>
+    <div class="leg"><div class="legdot" style="background:#a78bfa"></div>関連概念</div>
+    <div class="leg"><div class="legdot" style="background:#34d399"></div>架け橋</div>
+  </div>
+</div>
+
+<div class="filters">
+  <div class="fbtn fbtn-you on" onclick="toggleFilter('you',this)">あなたの経験・テーマ</div>
+  <div class="fbtn fbtn-dlz on" onclick="toggleFilter('dlz',this)">ドゥルーズ概念</div>
+  <div class="fbtn fbtn-phil on" onclick="toggleFilter('phil',this)">影響した哲学者</div>
+  <div class="fbtn fbtn-oppose on" onclick="toggleFilter('oppose',this)">対抗・乗り越え</div>
+  <div class="fbtn fbtn-concept on" onclick="toggleFilter('concept',this)">関連概念</div>
+  <div class="fbtn fbtn-bridge on" onclick="toggleFilter('bridge',this)">架け橋</div>
+</div>
+
+<div class="map-wrap">
+  <div id="map">
+    <svg id="svg-layer"></svg>
+  </div>
+</div>
+
+<div class="panel" id="panel">
+  <div class="panel-inner">
+    <div class="panel-top">
+      <div>
+        <div class="panel-name" id="p-name"></div>
+        <div class="panel-type" id="p-type"></div>
+      </div>
+      <button class="close-btn" onclick="closePanel()">✕</button>
+    </div>
+    <div class="panel-body" id="p-body"></div>
+    <div class="panel-section" id="p-conn-wrap">
+      <div class="panel-slabel">繋がっているもの</div>
+      <div class="conn-list" id="p-conn"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ノード定義
+const NODES = {
+  // ===== CENTER =====
+  dlz: {
+    x:50, y:50,
+    type:'n-center', cat:'dlz',
+    label:'ドゥルーズ',
+    typelabel:'中心',
+    body:'1925–1995。「差異は同一性に先立つ」——プラトン以来の同一性の哲学を逆転させ、差異・生成・内在性を哲学の核心に置いた。スピノザ・ヒューム・ニーチェ・ベルクソンという「地下の水脈」を掘り起こし、カントとヘーゲルという「主流」と対決した。ガタリとの共著では資本主義・欲望・政治へと哲学を開いた。',
+    conn:['差異と反復','内在性の平面','リゾーム','逃走線','リトルネロ','器官なき身体','脱領土化','スピノザ','ニーチェ','ベルクソン','ヒューム','カント','ヘーゲル','プラトン','フーコー','躁鬱の波','逃走・移住','身体感覚','傘とカオス']
+  },
+
+  // ===== あなたの経験・テーマ =====
+  you_wave: {
+    x:12, y:30,
+    type:'n-you', cat:'you',
+    label:'躁鬱の波',
+    typelabel:'あなたの経験',
+    body:'躁と鬱という二つの状態の往復。「たのしいのに、生きたくない」という同時性。ヒューム的に言えば「自己は固定した実体ではなく、状態によって異なる印象と観念の束」。ドゥルーズ的に言えば「波は止揚されない——差異として繰り返す」。毎回の波は前回と微妙に異なる——これがベルクソンの持続の問いと直結する。',
+    conn:['差異と反復','持続（durée）','ヒューム','スピノザ','情動（喜び/悲しみ）','ヘーゲル（対立）']
+  },
+  you_escape: {
+    x:10, y:50,
+    type:'n-you', cat:'you',
+    label:'逃走・移住',
+    typelabel:'あなたの経験',
+    body:'東京から江ノ島へ、海士町へ。「単なる逃避ではない何か」として書こうとしているテーマ。ニーチェ的に言えば「怨恨（弱さ）からの逃走」ではなく「新しい価値を創造するための逃走（能動的な力）」。ドゥルーズの「逃走線（ligne de fuite）」は「逃げる」のではなく「流れ出る、滲み出る」運動。',
+    conn:['逃走線','脱領土化','ニーチェ','リトルネロ','江ノ島・電車','海士町・海岸']
+  },
+  you_body: {
+    x:12, y:68,
+    type:'n-you', cat:'you',
+    label:'身体感覚',
+    typelabel:'あなたの経験',
+    body:'「脈拍・呼吸・体温で場所を測る」「身体の芯が冷えていくような感覚」——これはメルロ＝ポンティ的な「生きられた身体（corps vécu）」の記述。ドゥルーズの「器官なき身体（CsO）」は器官（機能・役割）に分割される前の身体の潜在的な次元——強度が流れ、欲望が働く場所。',
+    conn:['器官なき身体','メルロ＝ポンティ','強度（intensité）','スピノザ']
+  },
+  you_enoshima: {
+    x:25, y:20,
+    type:'n-you', cat:'you',
+    label:'江ノ島・電車',
+    typelabel:'あなたの経験',
+    body:'鬱の日に必ずカメラと本を持ち江ノ島へ向かった。「電車の座席という物理的な拘束と、移動しているという社会的な免罪符」。ドゥルーズのリトルネロ——「暗闇の中で子供が歌う鼻歌」——として読める。カオスの中に自分の小さな安全な領土を作ること。',
+    conn:['リトルネロ','逃走・移住','持続（durée）','脱領土化']
+  },
+  you_amachi: {
+    x:25, y:75,
+    type:'n-you', cat:'you',
+    label:'海士町・海岸',
+    typelabel:'あなたの経験',
+    body:'島根県海士町への移住。「強い社会的意味（第1象限）」の東京から「非意味の自由」へ。スピノザ的に言えば「悲しみの情動（力を減少させる）」から「喜びの情動（力を増大させる）」への移行。マルクス的に言えば「資本主義的欲望管理からの脱領土化の試み」。',
+    conn:['リトルネロ','脱領土化','逃走・移住','スピノザ','情動（喜び/悲しみ）']
+  },
+  you_ruin: {
+    x:20, y:87,
+    type:'n-you', cat:'you',
+    label:'廃墟・フィールドワーク',
+    typelabel:'あなたの経験',
+    body:'気仙沼・陸前高田など。「復興という正しい物語が個人の記憶を圧殺する」——ベンヤミンの「歴史の天使」と直接接続する問い。「公の記憶（アーカイブ）が個人の記憶（オーラ的体験）を圧倒する」。インゴルドの「歩きながら知る」という方法論とも重なる。',
+    conn:['記憶と過去','ベンヤミン','インゴルド','リゾーム']
+  },
+  you_umbrella: {
+    x:38, y:18,
+    type:'n-you', cat:'you',
+    label:'傘とカオス',
+    typelabel:'あなたの文章の核心概念',
+    body:'ドゥルーズ＝ガタリ「思考はカオスから身を守る傘だ、しかし傘に穴を開けてカオスの一撃を通すことで創造が生まれる」。あなたの「スリットの入った傘」はこの直接の展開。「完全な秩序（窒息）」でも「完全なカオス（崩壊）」でもなく、穴の開いた傘として存在すること——これがあなたの文章の中心テーマ。',
+    conn:['内在性の平面','リトルネロ','差異と反復','躁鬱の波']
+  },
+  you_ritournelle: {
+    x:35, y:85,
+    type:'n-you', cat:'you',
+    label:'リトルネロ（安全なカオス）',
+    typelabel:'あなたの文章の核心概念',
+    body:'ドゥルーズ＝ガタリの「リトルネロ（ritournelle）」——暗闇の中で子供が歌う鼻歌。カオスに対して小さな安定した領土（港）を作る力。あなたの「安全なカオス」という概念はこれと完全に一致する。江ノ島の電車も、海士町の海岸歩きも、廃墟での撮影も——すべてリトルネロとして記述できる。',
+    conn:['リトルネロ','逃走線','脱領土化','傘とカオス','江ノ島・電車','海士町・海岸']
+  },
+
+  // ===== ドゥルーズ概念 =====
+  diff_rep: {
+    x:62, y:22,
+    type:'n-concept', cat:'dlz',
+    label:'差異と反復',
+    typelabel:'ドゥルーズ主著・概念',
+    body:'「同じものが繰り返すのではなく、差異が繰り返す」——真の反復は毎回の繰り返しに微妙な差異を含む。プラトン的な「同一性（オリジナルとコピー）」への根本的な批判。ベルクソンの持続論・ニーチェの永劫回帰・カントの超越論的発想の三つを統合しながら乗り越えた主著（1968）。',
+    conn:['ドゥルーズ','ベルクソン','ニーチェ','カント','ヘーゲル（対立）','プラトン（対立）','持続（durée）','永劫回帰','躁鬱の波','傘とカオス']
+  },
+  immanence: {
+    x:72, y:35,
+    type:'n-concept', cat:'dlz',
+    label:'内在性の平面',
+    typelabel:'ドゥルーズ核心概念',
+    body:'「超越性のない地平」——神・真理・規範という「上から支配する力」を廃した、生成・差異・力が働く平面。スコトゥスの「存在の一義性」→スピノザの「神すなわち自然」→ドゥルーズという系譜。「すべての存在が同じ声で語られる」——階層がない世界。',
+    conn:['ドゥルーズ','スピノザ','スコトゥス','存在の一義性','傘とカオス']
+  },
+  rhizome: {
+    x:65, y:72,
+    type:'n-concept', cat:'dlz',
+    label:'リゾーム',
+    typelabel:'ドゥルーズ＝ガタリ概念',
+    body:'根（ルート）やツリー（階層構造）に対置される「地下茎」の比喩。中心がなく、どこからでも伸び、どこでも切れ、また別の場所で繋がる——これはあなたが「救われた」と感じた発想の核心。ツリー型思考（マトリクス）への批判でもあり、あなた自身がマトリクスを「他者への説明のための鎧」と言ったことと直結する。',
+    conn:['ドゥルーズ','廃墟・フィールドワーク','インゴルド','内在性の平面','リトルネロ（安全なカオス）']
+  },
+  fuite: {
+    x:62, y:55,
+    type:'n-concept', cat:'dlz',
+    label:'逃走線',
+    typelabel:'ドゥルーズ＝ガタリ概念',
+    body:'「ligne de fuite」——組織・構造・権力から逃れ出る線。「逃げる」のではなく「流れ出る、滲み出る」イメージ。最も危険な線でもある——虚無・死へつながる可能性もある（だからこそ「安全な逃走線」という問いが重要）。あなたの「逃走」テーマの哲学的な正確な用語。',
+    conn:['ドゥルーズ','脱領土化','逃走・移住','リトルネロ（安全なカオス）','ニーチェ']
+  },
+  ritournelle: {
+    x:50, y:75,
+    type:'n-concept', cat:'dlz',
+    label:'リトルネロ',
+    typelabel:'ドゥルーズ＝ガタリ概念',
+    body:'「暗闇の中で子供が歌う鼻歌」——カオスに対して小さな安定した領土（港）を作る力。三つの瞬間：①カオスの中で鼻歌を歌う（小さな秩序）、②家の中で歌う（領土化）、③外へ向かって歌う（脱領土化）。この三重の運動があなたの文章の構造に対応する。',
+    conn:['ドゥルーズ','脱領土化','逃走線','リトルネロ（安全なカオス）','江ノ島・電車','海士町・海岸']
+  },
+  cso: {
+    x:72, y:62,
+    type:'n-concept', cat:'dlz',
+    label:'器官なき身体',
+    typelabel:'ドゥルーズ＝ガタリ概念',
+    body:'「Corps sans Organes（CsO）」——器官（機能・役割）に分割される前の身体の潜在的な次元。「身体は器官に先立つ」——強度が流れ、欲望が分配される場所。社会や権力によって「器官化（機能・役割へと分割）」される前の身体への回帰の試み。あなたの「身体の芯が冷えていくような感覚」の哲学的な位置。',
+    conn:['ドゥルーズ','身体感覚','メルロ＝ポンティ','スピノザ','強度（intensité）']
+  },
+  deterri: {
+    x:50, y:62,
+    type:'n-concept', cat:'dlz',
+    label:'脱領土化',
+    typelabel:'ドゥルーズ＝ガタリ概念',
+    body:'「領土（territoire）」から逃れ出る運動。しかし必ず「再領土化（reterritorialisation）」が伴う——新たな場所に定着する。東京（強い領土）→逃走→海士町（新たな領土？）——しかし海士町もまた領土になり得る。この往復運動が「逃走線」と「リトルネロ」の関係。',
+    conn:['ドゥルーズ','逃走線','リトルネロ','逃走・移住','海士町・海岸','江ノ島・電車']
+  },
+  intensite: {
+    x:75, y:50,
+    type:'n-concept', cat:'dlz',
+    label:'強度（intensité）',
+    typelabel:'ドゥルーズ概念',
+    body:'「差異そのものが強度として存在する」——同一性ではなく強度の差異が実在の根拠。スピノザの「力を増大・減少させる情動（喜び/悲しみ）」の現代的展開。あなたの「4象限マトリクス（強度の軸・意味の軸）」の「強度の軸」はこれを直感的に捉えている。',
+    conn:['ドゥルーズ','スピノザ','情動（喜び/悲しみ）','器官なき身体','差異と反復']
+  },
+
+  // ===== 影響した哲学者 =====
+  spinoza: {
+    x:88, y:28,
+    type:'n-phil', cat:'phil',
+    label:'スピノザ',
+    typelabel:'影響した哲学者',
+    body:'1632–1677。「哲学の王子」とドゥルーズが呼んだ人。「神すなわち自然（Deus sive Natura）」——すべては一つの実体（神＝自然）の表れ。精神と身体は別々の実体ではなく同一の実体の二つの属性。「コナトゥス（自己の存在を維持・強化しようとする努力）」がすべての存在者に内在する。情動論：「喜び（力を増大させる）」と「悲しみ（力を減少させる）」で感情を評価する——道徳ではなく力の増減で。',
+    conn:['ドゥルーズ','内在性の平面','コナトゥス','情動（喜び/悲しみ）','存在の一義性','器官なき身体','身体感覚','海士町・海岸']
+  },
+  nietzsche: {
+    x:88, y:45,
+    type:'n-phil', cat:'phil',
+    label:'ニーチェ',
+    typelabel:'影響した哲学者',
+    body:'1844–1900。「神は死んだ」——価値の根拠の崩壊と、ニヒリズムの克服。「力への意志」は権力への欲望ではなく「自己を超えていく力」。「永劫回帰」——同一なものの回帰ではなく、差異の永遠回帰（ドゥルーズ解釈）。「ルサンチマン（怨恨）」——弱さから来る否定的な力への批判。ドゥルーズはニーチェを「肯定の哲学者」として読んだ。',
+    conn:['ドゥルーズ','差異と反復','永劫回帰','逃走線','逃走・移住','ヘーゲル（対立）']
+  },
+  bergson: {
+    x:88, y:60,
+    type:'n-phil', cat:'phil',
+    label:'ベルクソン',
+    typelabel:'影響した哲学者・架け橋',
+    body:'1859–1941。ドゥルーズが最も多く論じた哲学者。「持続（durée）」——時間は空間的（点の連続）に理解できない、質的に変化し続ける流れ。「純粋な過去」——過去は消えず現在の下に潜在的に保存される。「生の躍動（élan vital）」——生命は常に自己差異化する創造的な力。直観の方法——事象の持続に自分を同化させること。村山達也「ベルクソン入門」を今読んでいる。',
+    conn:['ドゥルーズ','差異と反復','持続（durée）','記憶と過去','強度（intensité）','躁鬱の波','身体感覚']
+  },
+  hume: {
+    x:88, y:75,
+    type:'n-phil', cat:'phil',
+    label:'ヒューム',
+    typelabel:'影響した哲学者（出発点）',
+    body:'1711–1776。ドゥルーズの最初の著作（『経験論と主体性』1953）の主題。「因果関係は習慣に過ぎない」「自己は印象と観念の束（バンドル）だ」——主体は固定した実体ではなく、習慣・連合・経験の過程の中で構成される効果。「理性は情念の奴隷だ」——欲望・情動が一次的。躁と鬱で「私」が全く別の束として機能するという直感と一致する。',
+    conn:['ドゥルーズ','習慣と連合','躁鬱の波']
+  },
+  kant: {
+    x:80, y:18,
+    type:'n-bridge', cat:'bridge',
+    label:'カント',
+    typelabel:'受け継ぎながら批判した哲学者',
+    body:'1724–1804。「物自体（Ding an sich）は認識できない」「認識の形式は人間の側にある（コペルニクス的転回）」。ドゥルーズは「超越論的」という発想を受け継ぎながら批判する——「カントの条件（時間・空間・カテゴリー）が同一性に基づいている」。ドゥルーズは「差異そのものを超越論的条件とする」という方向に進む。ユクスキュルの環世界はカントの認識形式論の生物学的展開。',
+    conn:['ドゥルーズ','差異と反復','ヘーゲル（対立）','ユクスキュル','環世界']
+  },
+  foucault: {
+    x:80, y:85,
+    type:'n-bridge', cat:'bridge',
+    label:'フーコー',
+    typelabel:'親友・対話者',
+    body:'1926–1984。ドゥルーズの親友。「権力は上から降ってくるのではなく毛細血管のように浸透する」「エピステーメー（真理の枠組みの歴史性）」「主体は権力・知識の実践によって構成される」。ドゥルーズとの違い：欲望と権力のどちらが一次的か——フーコー「権力が欲望を産む」、ドゥルーズ「欲望が権力に先立つ」。',
+    conn:['ドゥルーズ','逃走線','内在性の平面']
+  },
+
+  // ===== 対抗軸 =====
+  hegel: {
+    x:65, y:12,
+    type:'n-oppose', cat:'oppose',
+    label:'ヘーゲル（対立）',
+    typelabel:'最大の論敵',
+    body:'1770–1831。弁証法——「テーゼ→アンチテーゼ→ジンテーゼ（止揚）」。差異を「矛盾」として否定的に処理し、より高次の同一性へ回収する。「歴史は自由の意識の進歩だ」という目的論的歴史観。ドゥルーズの批判の核心：「差異は矛盾ではない」「生成は同一性への回収ではない」「歴史に目的はない」。あなたの文章に引き寄せると：「苦しみはいつか意味を持つ」という思考がヘーゲル的。',
+    conn:['ドゥルーズ','差異と反復','ニーチェ','カント','躁鬱の波']
+  },
+  plato: {
+    x:75, y:10,
+    type:'n-oppose', cat:'oppose',
+    label:'プラトン（対立）',
+    typelabel:'逆転すべき相手',
+    body:'BC427–347。「オリジナル（イデア）→コピー（現象）→シミュラークル」という価値の階層。シミュラークルを最下層に排除。ドゥルーズ「プラトンを逆転させること」——シミュラークルこそが一次的だ。あなたの文章への接続：「躁鬱という診断名（普遍・イデア）」ではなく「あなた個人の経験（シミュラークル）」を一次的なものとして書く。',
+    conn:['ドゥルーズ','差異と反復','内在性の平面']
+  },
+
+  // ===== 関連概念 =====
+  duree: {
+    x:78, y:70,
+    type:'n-concept', cat:'concept',
+    label:'持続（durée）',
+    typelabel:'ベルクソン概念',
+    body:'時間は「点の連続（空間化）」ではなく、過去が現在に流れ込み、常に質的に変化し続ける「流れ」——これが持続。「川を撮った写真をどれだけ並べても川の流れにはならない」。躁鬱の波を「点の連続（繰り返し）」ではなく「持続として生きられる変化の流れ」として理解することで、「また同じだ」という感覚を哲学的に解体できる。',
+    conn:['ベルクソン','差異と反復','記憶と過去','躁鬱の波']
+  },
+  memory: {
+    x:80, y:78,
+    type:'n-concept', cat:'concept',
+    label:'記憶と過去',
+    typelabel:'ベルクソン概念',
+    body:'「二種類の記憶」——習慣記憶（身体に刻まれた記憶）と純粋記憶（過去の出来事そのもの）。「純粋な過去は消えていない、現在の下に潜在的に保存され続けている」——「逆円錐としての記憶」。ドゥルーズの「潜在性（virtualité）」の直接の源泉。あなたのフィールドワークで扱う「公の記憶vs個人の記憶」はこれで記述できる。',
+    conn:['ベルクソン','ドゥルーズ','持続（durée）','廃墟・フィールドワーク','強度（intensité）']
+  },
+  conatus: {
+    x:90, y:35,
+    type:'n-concept', cat:'concept',
+    label:'コナトゥス',
+    typelabel:'スピノザ概念',
+    body:'「自己の存在を維持・強化しようとする努力」——すべての存在者に内在する根本的な力。ニーチェの「力への意志」、ドゥルーズの「欲望（désir）」への直接の先祖。「生き続けようとする力、強度を増大させようとする力」——あなたの文章の「たのしいのに、生きたくない」という問いは、コナトゥスの緊張として記述できる（コナトゥスが弱まった状態vs増大した状態）。',
+    conn:['スピノザ','ドゥルーズ','情動（喜び/悲しみ）','躁鬱の波']
+  },
+  joie_tristesse: {
+    x:90, y:50,
+    type:'n-concept', cat:'concept',
+    label:'情動（喜び/悲しみ）',
+    typelabel:'スピノザ概念',
+    body:'「私の力（コナトゥス）を増大させる情動＝喜び（laetitia）」「減少させる情動＝悲しみ（tristitia）」——善悪ではなく力の増減で感情を評価する。東京の仕事環境（悲しみ）、江ノ島の電車（喜び）、海士町の海岸（喜び）、布団から出られない日（悲しみ）——これがスピノザ的・ドゥルーズ的な「倫理学（エチカ）」の実践。道徳的判断ではなく強度の評価。',
+    conn:['スピノザ','ドゥルーズ','コナトゥス','強度（intensité）','身体感覚','海士町・海岸','躁鬱の波']
+  },
+  eternal_return: {
+    x:82, y:42,
+    type:'n-concept', cat:'concept',
+    label:'永劫回帰',
+    typelabel:'ニーチェ→ドゥルーズ概念',
+    body:'ニーチェ：「この人生を、このまま、無限に繰り返してもいいか」——生の肯定の最も厳しい試験。ドゥルーズの解釈：「同一なものが回帰するのではなく、差異が回帰する。毎回の繰り返しは前回と微妙に異なる差異を含む」——差異の永遠回帰。躁鬱の波は「また同じ波が来た」ではなく「毎回異なる差異として繰り返す」——ここに生の肯定の可能性がある。',
+    conn:['ニーチェ','ドゥルーズ','差異と反復','躁鬱の波']
+  },
+  univocite: {
+    x:82, y:22,
+    type:'n-concept', cat:'concept',
+    label:'存在の一義性',
+    typelabel:'スコトゥス→ドゥルーズ概念',
+    body:'「あらゆる存在者は同一の意味で『ある』と言える」——神も人間も石も、同じ平面の上にある。ドゥンス・スコトゥス（第3巻）→スピノザ（第5巻）→ドゥルーズ（第12巻）という系譜。存在に階層がない——超越的な審判者（神・真理・規範・診断名）を廃した「内在性の平面」の哲学的根拠。',
+    conn:['ドゥルーズ','スピノザ','内在性の平面']
+  },
+  kansei: {
+    x:50, y:40,
+    type:'n-bridge', cat:'bridge',
+    label:'環世界（ユクスキュル）',
+    typelabel:'架け橋・生物学的展開',
+    body:'ヤーコプ・フォン・ユクスキュル（1864–1944）。ダニには音も色もない——温度・匂い・振動だけの世界がある。「種ごとに固有の知覚の閉じた世界（環世界）」。カント「認識形式は人間の側にある」の生物学的展開。ドゥルーズ的に言えば「環世界は固定されていない、変えられる、作れる」。躁と鬱は文字通り別の環世界を生きること。あなたが「面白い」と言っていた概念。',
+    conn:['カント','ドゥルーズ','持続（durée）','躁鬱の波','身体感覚']
+  },
+  ingold: {
+    x:25, y:55,
+    type:'n-bridge', cat:'bridge',
+    label:'インゴルド',
+    typelabel:'架け橋・人類学',
+    body:'ティム・インゴルド（1948–）。「上から地図を描くのではなく、歩きながら線を引きながら世界を知っていく」——あなたが「救われた」と感じた研究の方法論。ドゥルーズ的な「リゾーム」「逃走線」と深く共鳴する。「地図制作（カルトグラフィー）」——あなたの4象限マトリクスも含め、あなたのすべての知的営みはカルトグラフィー（地図を作ること）だとドゥルーズは言う。',
+    conn:['ドゥルーズ','リゾーム','逃走・移住','廃墟・フィールドワーク']
+  },
+  benjamin: {
+    x:30, y:68,
+    type:'n-bridge', cat:'bridge',
+    label:'ベンヤミン',
+    typelabel:'架け橋・思想家',
+    body:'ヴァルター・ベンヤミン（1892–1940）。「歴史の天使」——廃墟を救いたい天使は進歩という嵐によって前に押し進められ続ける。「公の記憶が個人の記憶（アウラ的体験）を圧倒する」。気仙沼・陸前高田のフィールドワークで感じた「復興という正義が個人の記憶を圧殺する」という問いと直接接続する補助線。',
+    conn:['ドゥルーズ','廃墟・フィールドワーク','記憶と過去']
+  },
+  scotus: {
+    x:82, y:12,
+    type:'n-bridge', cat:'bridge',
+    label:'スコトゥス',
+    typelabel:'隠れた源泉',
+    body:'ドゥンス・スコトゥス（1266–1308）。「存在の一義性（univocité de l\'être）」——あらゆる存在は同じ意味で「ある」と言える。神と石が同じ平面にある。ドゥルーズの「内在性の平面」の哲学史的な起源。スコトゥス→スピノザ→ドゥルーズという「内在性の系譜」の最初の点。',
+    conn:['ドゥルーズ','スピノザ','存在の一義性','内在性の平面']
+  },
+  merleau: {
+    x:70, y:82,
+    type:'n-bridge', cat:'bridge',
+    label:'メルロ＝ポンティ',
+    typelabel:'架け橋・身体論',
+    body:'1908–1961。「私は身体を持つのではなく、私は身体だ」——精神と身体の二元論を超え、「知覚する身体（corps propre）」を哲学の中心に。「生きられた身体（corps vécu）」——解剖学的な客観的身体ではなく、主体的に生きられ経験される身体。あなたの「脈拍・呼吸・体温で場所を測る」「身体の芯が冷えていく」という記述は、このメルロ＝ポンティ的な記述法そのもの。',
+    conn:['ドゥルーズ','器官なき身体','身体感覚']
+  },
+  habit: {
+    x:90, y:68,
+    type:'n-concept', cat:'concept',
+    label:'習慣と連合',
+    typelabel:'ヒューム概念',
+    body:'ヒューム：知識は経験から来るが、その経験を組織するのは「習慣（custom）」と「連合（association）」。「自己は習慣と連合の産物であり、固定した実体ではない」。ドゥルーズはこれを「習慣こそが最初の綜合だ」として受け継ぐ——『差異と反復』の「習慣の綜合（第一の時間の綜合）」。',
+    conn:['ヒューム','ドゥルーズ','差異と反復']
+  },
+};
+
+// 接続定義 [nodeId1, nodeId2, color, opacity]
+const EDGES = [
+  // あなた ↔ ドゥルーズ概念
+  ['you_wave','diff_rep','#22c55e',.5],
+  ['you_wave','ritournelle','#22c55e',.4],
+  ['you_escape','fuite','#22c55e',.6],
+  ['you_escape','deterri','#22c55e',.5],
+  ['you_body','cso','#22c55e',.6],
+  ['you_umbrella','ritournelle','#22c55e',.6],
+  ['you_umbrella','immanence','#22c55e',.4],
+  ['you_enoshima','ritournelle','#22c55e',.6],
+  ['you_enoshima','deterri','#22c55e',.4],
+  ['you_amachi','deterri','#22c55e',.5],
+  ['you_amachi','ritournelle','#22c55e',.4],
+  ['you_ruin','rhizome','#22c55e',.4],
+  ['you_ritournelle','ritournelle','#22c55e',.8],
+  ['you_ritournelle','fuite','#22c55e',.5],
+
+  // ドゥルーズ中心 ↔ 概念
+  ['dlz','diff_rep','#f59e0b',.7],
+  ['dlz','immanence','#f59e0b',.7],
+  ['dlz','rhizome','#f59e0b',.6],
+  ['dlz','fuite','#f59e0b',.7],
+  ['dlz','ritournelle','#f59e0b',.7],
+  ['dlz','cso','#f59e0b',.6],
+  ['dlz','deterri','#f59e0b',.6],
+  ['dlz','intensite','#f59e0b',.6],
+
+  // ドゥルーズ ↔ 哲学者
+  ['dlz','spinoza','#60a5fa',.6],
+  ['dlz','nietzsche','#60a5fa',.6],
+  ['dlz','bergson','#60a5fa',.6],
+  ['dlz','hume','#60a5fa',.5],
+  ['dlz','kant','#34d399',.5],
+  ['dlz','foucault','#34d399',.5],
+  ['dlz','hegel','#f87171',.5],
+  ['dlz','plato','#f87171',.5],
+
+  // 哲学者 ↔ 概念
+  ['spinoza','conatus','#60a5fa',.6],
+  ['spinoza','joie_tristesse','#60a5fa',.6],
+  ['spinoza','immanence','#60a5fa',.5],
+  ['spinoza','univocite','#60a5fa',.4],
+  ['nietzsche','eternal_return','#60a5fa',.6],
+  ['nietzsche','fuite','#60a5fa',.4],
+  ['bergson','duree','#60a5fa',.7],
+  ['bergson','memory','#60a5fa',.6],
+  ['hume','habit','#60a5fa',.6],
+  ['kant','kansei','#34d399',.5],
+  ['scotus','univocite','#34d399',.6],
+  ['scotus','immanence','#34d399',.4],
+
+  // 概念同士
+  ['conatus','joie_tristesse','#a78bfa',.5],
+  ['joie_tristesse','intensite','#a78bfa',.5],
+  ['duree','diff_rep','#a78bfa',.5],
+  ['duree','memory','#a78bfa',.5],
+  ['eternal_return','diff_rep','#a78bfa',.5],
+  ['univocite','immanence','#a78bfa',.5],
+
+  // 架け橋
+  ['kansei','you_wave','#34d399',.4],
+  ['ingold','you_ruin','#34d399',.5],
+  ['ingold','rhizome','#34d399',.5],
+  ['benjamin','you_ruin','#34d399',.6],
+  ['merleau','cso','#34d399',.5],
+  ['merleau','you_body','#34d399',.5],
+
+  // あなた同士
+  ['you_wave','you_umbrella','#22c55e',.3],
+  ['you_escape','you_enoshima','#22c55e',.3],
+  ['you_escape','you_amachi','#22c55e',.3],
+  ['you_ritournelle','you_enoshima','#22c55e',.4],
+  ['you_ritournelle','you_amachi','#22c55e',.4],
+  ['you_ruin','you_amachi','#22c55e',.3],
+];
+
+const mapW = 900, mapH = 780;
+document.getElementById('map').style.width = mapW+'px';
+document.getElementById('map').style.height = mapH+'px';
+
+// SVG lines
+function drawEdges(filter=null){
+  const svg = document.getElementById('svg-layer');
+  svg.innerHTML = '';
+  svg.setAttribute('viewBox',`0 0 ${mapW} ${mapH}`);
+  EDGES.forEach(([a,b,col,op])=>{
+    const na = NODES[a], nb = NODES[b];
+    if(!na||!nb) return;
+    if(filter){
+      const catA = NODES[a]?.cat, catB = NODES[b]?.cat;
+      if(!filter.has(catA)&&!filter.has(catB)) return;
+    }
+    const x1=na.x/100*mapW, y1=na.y/100*mapH;
+    const x2=nb.x/100*mapW, y2=nb.y/100*mapH;
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',x1);line.setAttribute('y1',y1);
+    line.setAttribute('x2',x2);line.setAttribute('y2',y2);
+    line.setAttribute('stroke',col);
+    line.setAttribute('stroke-opacity',op);
+    line.setAttribute('stroke-width','1.2');
+    svg.appendChild(line);
+  });
+}
+
+// Create nodes
+const mapEl = document.getElementById('map');
+Object.entries(NODES).forEach(([id,n])=>{
+  const div = document.createElement('div');
+  div.className = `node ${n.type}`;
+  div.id = 'nd_'+id;
+  div.dataset.id = id;
+  div.dataset.cat = n.cat;
+  div.style.left = n.x+'%';
+  div.style.top = n.y+'%';
+  div.innerHTML = `<div class="nbody">${n.label}</div>`;
+  div.addEventListener('click',()=>openPanel(id));
+  mapEl.appendChild(div);
+});
+
+drawEdges();
+
+// Panel
+function openPanel(id){
+  const n = NODES[id];
+  if(!n) return;
+  document.querySelectorAll('.node').forEach(el=>el.classList.remove('active'));
+  document.getElementById('nd_'+id)?.classList.add('active');
+
+  const typeColors = {you:'#22c55e',dlz:'#f59e0b',phil:'#60a5fa',oppose:'#f87171',concept:'#a78bfa',bridge:'#34d399'};
+  const col = typeColors[n.cat]||'#888';
+  document.getElementById('p-name').textContent = n.label;
+  const pt = document.getElementById('p-type');
+  pt.textContent = n.typelabel||'';
+  pt.style.background = col+'22';
+  pt.style.color = col;
+  pt.style.border = `1px solid ${col}44`;
+  document.getElementById('p-body').innerHTML = n.body;
+
+  const connEl = document.getElementById('p-conn');
+  connEl.innerHTML = '';
+  if(n.conn&&n.conn.length){
+    document.getElementById('p-conn-wrap').style.display='block';
+    n.conn.forEach(cname=>{
+      const cid = Object.entries(NODES).find(([k,v])=>v.label===cname)?.[0];
+      const tag = document.createElement('span');
+      tag.className = 'conn-tag';
+      tag.textContent = cname;
+      if(cid){
+        const ccat = NODES[cid].cat;
+        const cls = {you:'you-conn',dlz:'dlz-conn',phil:'phil-conn',concept:'concept-conn',bridge:'concept-conn'}[ccat]||'';
+        if(cls) tag.classList.add(cls);
+        tag.onclick = ()=>openPanel(cid);
+      }
+      connEl.appendChild(tag);
+    });
+  } else {
+    document.getElementById('p-conn-wrap').style.display='none';
+  }
+
+  document.getElementById('panel').classList.add('open');
+}
+
+function closePanel(){
+  document.getElementById('panel').classList.remove('open');
+  document.querySelectorAll('.node').forEach(el=>el.classList.remove('active'));
+}
+
+// Filters
+const activeFilters = new Set(['you','dlz','phil','oppose','concept','bridge']);
+function toggleFilter(cat, btn){
+  if(activeFilters.has(cat)){
+    if(activeFilters.size===1) return;
+    activeFilters.delete(cat);
+    btn.classList.remove('on');
+  } else {
+    activeFilters.add(cat);
+    btn.classList.add('on');
+  }
+  document.querySelectorAll('.node').forEach(el=>{
+    const c = el.dataset.cat;
+    el.style.opacity = activeFilters.has(c)?'1':'0.08';
+    el.style.pointerEvents = activeFilters.has(c)?'auto':'none';
+  });
+  drawEdges(activeFilters);
+}
+</script>
+</body>
+</html>

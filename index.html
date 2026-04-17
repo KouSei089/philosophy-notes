@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>哲学探究ノート——泉の地図</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background:#f5f4f0;color:#1a1a1a;padding-bottom:40px}
+
+.hdr{padding:24px 20px 20px;background:#fff;border-bottom:1px solid #e0ddd8}
+.hdr-top{display:flex;align-items:flex-start;gap:14px;margin-bottom:6px}
+.hdr-icon{width:44px;height:44px;border-radius:12px;background:#FAEEDA;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.hdr h1{font-size:20px;font-weight:700;color:#111;line-height:1.3}
+.hdr p{font-size:13px;color:#888;margin-top:4px}
+.hdr-date{font-size:11px;color:#bbb;margin-top:8px}
+
+.wrap{max-width:680px;margin:0 auto;padding:16px}
+
+/* section */
+.sec{margin-bottom:28px}
+.sec-title{font-size:12px;font-weight:700;color:#aaa;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;padding-left:2px}
+
+/* card */
+.card{background:#fff;border-radius:14px;padding:16px;margin-bottom:10px;border:1px solid #e8e5e0;cursor:pointer;transition:transform .1s,box-shadow .1s;text-decoration:none;display:block;color:inherit}
+.card:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.card-top{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.card-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.card-label{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px}
+.card-title{font-size:15px;font-weight:600;color:#111}
+.card-desc{font-size:13px;color:#666;line-height:1.65}
+.card-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.ctag{font-size:11px;padding:2px 8px;border-radius:10px;background:#f0ede8;color:#666}
+.card-badge{font-size:10px;padding:2px 7px;border-radius:8px;margin-left:auto;flex-shrink:0}
+
+/* insight card */
+.insight{background:#fff;border-radius:14px;padding:16px;margin-bottom:10px;border:1px solid #e8e5e0}
+.insight-date{font-size:10px;color:#bbb;margin-bottom:6px}
+.insight-body{font-size:14px;color:#222;line-height:1.8}
+.insight-tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;margin-top:8px}
+
+/* plan card */
+.plan{background:#fff;border-radius:14px;padding:16px;margin-bottom:10px;border:1px solid #e8e5e0}
+.plan-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}
+.plan-row:last-child{margin-bottom:0}
+.plan-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:1px}
+.plan-content{}
+.plan-title{font-size:13px;font-weight:600;color:#222;margin-bottom:2px}
+.plan-body{font-size:12px;color:#777;line-height:1.6}
+
+/* three readings */
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.three-item{background:#fff;border-radius:12px;padding:12px;border:1px solid #e8e5e0;text-align:center}
+.three-icon{font-size:20px;margin-bottom:5px}
+.three-label{font-size:10px;color:#aaa;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:3px}
+.three-title{font-size:12px;font-weight:600;color:#222}
+.three-body{font-size:11px;color:#777;line-height:1.5;margin-top:4px}
+
+/* quote */
+.quote-card{background:#FEFAF2;border-radius:14px;padding:16px;margin-bottom:10px;border-left:4px solid #EF9F27}
+.quote-text{font-size:14px;color:#333;line-height:1.8;font-style:italic}
+.quote-from{font-size:11px;color:#BA7517;margin-top:8px;font-weight:600}
+
+/* progress */
+.progress-wrap{background:#fff;border-radius:14px;padding:16px;margin-bottom:10px;border:1px solid #e8e5e0}
+.prog-title{font-size:13px;font-weight:600;color:#222;margin-bottom:10px}
+.prog-item{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.prog-label{font-size:12px;color:#555;flex:1}
+.prog-bg{height:4px;border-radius:2px;background:#eee;width:80px;overflow:hidden;flex-shrink:0}
+.prog-fill{height:4px;border-radius:2px}
+.prog-pct{font-size:10px;color:#aaa;width:28px;text-align:right;flex-shrink:0}
+
+/* colors */
+.c-amber{background:#FAEEDA;color:#BA7517}
+.c-purple{background:#EEEDFE;color:#3C3489}
+.c-blue{background:#E6F1FB;color:#0C447C}
+.c-green{background:#E1F5EE;color:#085041}
+.c-coral{background:#FAECE7;color:#712B13}
+.c-teal{background:#E1F5EE;color:#085041}
+.fill-amber{background:linear-gradient(90deg,#f59e0b,#EF9F27)}
+.fill-purple{background:#7F77DD}
+.fill-blue{background:#378ADD}
+.fill-green{background:#22c55e}
+.fill-teal{background:#1D9E75}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-top">
+    <div class="hdr-icon">📚</div>
+    <div>
+      <h1>哲学探究ノート<br>——泉の地図</h1>
+      <p>ドゥルーズへ向かう読書と思索の記録</p>
+    </div>
+  </div>
+  <div class="hdr-date">開始：2026年4月 · 更新：随時</div>
+</div>
+
+<div class="wrap">
+
+  <!-- 核心的な気づき -->
+  <div class="sec">
+    <div class="sec-title">最近の気づき</div>
+
+    <div class="quote-card">
+      <div class="quote-text">「悲しみというものを比較する。それは一つの大きな悲しみとして捉えるのではなく、それぞれ個別具体的なラベリング不可能な悲しみとして捉えているのが私の考え方そのものに当てはまっている」</div>
+      <div class="quote-from">ベルクソン『直接与件』を読んで — 2026年4月</div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-date">ベルクソン入門・第1章より</div>
+      <div class="insight-body">「躁鬱という診断名」はまさに悲しみを空間化したもの——「双極性障害の鬱状態」というラベルは、それぞれの布団から出られない日を「同じ状態の繰り返し」として均質化する。しかし内側から経験される悲しみは、それぞれ質的にまったく異なる固有の状態だ。ラベリング不可能。これがベルクソンの言う「直接与件」。</div>
+      <span class="insight-tag c-amber">ベルクソン</span>
+      <span class="insight-tag c-purple">差異と反復</span>
+      <span class="insight-tag c-green">自分の経験</span>
+    </div>
+
+    <div class="insight">
+      <div class="insight-date">重要な気づき</div>
+      <div class="insight-body">「身体の芯が冷えていくような感覚」という書き方——これはベルクソンを読む前から、すでにベルクソン的に書いていた。「悲しみ」でも「鬱」でもなく、「冷えていく」という身体の直接与件として。ラベリングを拒否する書き方が、すでに実践されていた。</div>
+      <span class="insight-tag c-green">自分の文章</span>
+      <span class="insight-tag c-amber">持続（durée）</span>
+    </div>
+  </div>
+
+  <!-- 三つの読み方 -->
+  <div class="sec">
+    <div class="sec-title">ベルクソンへの三つのアプローチ</div>
+    <div class="three">
+      <div class="three-item">
+        <div class="three-icon">📖</div>
+        <div class="three-label">単体</div>
+        <div class="three-title">ベルクソン自身</div>
+        <div class="three-body">時間と自由はどういうものか。テキストに忠実に。</div>
+      </div>
+      <div class="three-item">
+        <div class="three-icon">🔗</div>
+        <div class="three-label">継承</div>
+        <div class="three-title">ドゥルーズの中で</div>
+        <div class="three-body">持続→差異と反復。純粋な過去→潜在性。どこを変形したか。</div>
+      </div>
+      <div class="three-item">
+        <div class="three-icon">🪞</div>
+        <div class="three-label">実践</div>
+        <div class="three-title">私の経験として</div>
+        <div class="three-body">躁鬱・逃走・身体感覚が新しく見えてくる。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 図解・ドキュメント -->
+  <div class="sec">
+    <div class="sec-title">図解・ドキュメント</div>
+
+    <a class="card" href="connection_map.html">
+      <div class="card-top">
+        <div class="card-icon c-green">🕸</div>
+        <div style="flex:1">
+          <div class="card-label" style="color:#22c55e">最重要</div>
+          <div class="card-title">私・ドゥルーズ・哲学者・概念の繋がりマップ</div>
+        </div>
+        <span class="card-badge c-green">ネットワーク</span>
+      </div>
+      <div class="card-desc">躁鬱の波・江ノ島・海士町・傘とカオスなど、あなたの経験と哲学概念の繋がりをインタラクティブに表示。ノードをタップすると詳細と接続が見える。フィルターで絞り込み可能。読書が進むにつれてアップデートしていく生きた地図。</div>
+      <div class="card-tags">
+        <span class="ctag">あなたの経験</span>
+        <span class="ctag">ドゥルーズ概念</span>
+        <span class="ctag">影響した哲学者</span>
+        <span class="ctag">インタラクティブ</span>
+      </div>
+    </a>
+
+    <a class="card" href="philosophy_v3.html">
+      <div class="card-top">
+        <div class="card-icon c-amber">🗺</div>
+        <div style="flex:1">
+          <div class="card-label" style="color:#BA7517">完全版</div>
+          <div class="card-title">哲学の歴史シリーズ 完全版地図</div>
+        </div>
+        <span class="card-badge c-amber">詳細マップ</span>
+      </div>
+      <div class="card-desc">中公「哲学の歴史」全12巻＋ベルクソン独立項目。各巻の潮流・時代背景・哲学者詳細・主著・概念・よくある誤解・ドゥルーズへの接続・あなたの文章との繋がりまで収録。読み込み度インジケーター付き。辞書として使う。</div>
+      <div class="card-tags">
+        <span class="ctag">全12巻</span>
+        <span class="ctag">ベルクソン独立項目</span>
+        <span class="ctag">ドゥルーズへの接続</span>
+        <span class="ctag">あなたの文章との繋がり</span>
+      </div>
+    </a>
+
+    <a class="card" href="philosophy_detailed.html">
+      <div class="card-top">
+        <div class="card-icon c-blue">📋</div>
+        <div style="flex:1">
+          <div class="card-label" style="color:#185FA5">詳細版</div>
+          <div class="card-title">哲学の歴史シリーズ 詳細ガイド</div>
+        </div>
+        <span class="card-badge c-blue">ガイド</span>
+      </div>
+      <div class="card-desc">各巻の読み込み度・潮流・重要人物・ドゥルーズとの繋がりをコンパクトに。次の巻へのナビゲーション付き。</div>
+      <div class="card-tags">
+        <span class="ctag">読み込み度</span>
+        <span class="ctag">重要人物</span>
+        <span class="ctag">次巻ナビ</span>
+      </div>
+    </a>
+
+    <a class="card" href="philosophy_map.html">
+      <div class="card-top">
+        <div class="card-icon c-purple">🧭</div>
+        <div style="flex:1">
+          <div class="card-label" style="color:#534AB7">基本版</div>
+          <div class="card-title">哲学の歴史シリーズ 基本マップ</div>
+        </div>
+        <span class="card-badge c-purple">概要</span>
+      </div>
+      <div class="card-desc">シンプルな概要版。各巻の潮流と重要人物をさっと確認したいときに。</div>
+      <div class="card-tags">
+        <span class="ctag">シンプル</span>
+        <span class="ctag">概要確認用</span>
+      </div>
+    </a>
+  </div>
+
+  <!-- 読書進捗 -->
+  <div class="sec">
+    <div class="sec-title">読書進捗</div>
+    <div class="progress-wrap">
+      <div class="prog-title">現在読んでいる・読んだもの</div>
+      <div class="prog-item">
+        <div class="prog-label">村山達也『ベルクソン入門』</div>
+        <div class="prog-bg"><div class="prog-fill fill-amber" style="width:20%"></div></div>
+        <div class="prog-pct">第1章</div>
+      </div>
+      <div class="prog-item">
+        <div class="prog-label">哲学の歴史 第4巻（ルネサンス）</div>
+        <div class="prog-bg"><div class="prog-fill fill-blue" style="width:30%"></div></div>
+        <div class="prog-pct">途中</div>
+      </div>
+      <div class="prog-item">
+        <div class="prog-label">哲学の歴史 第7巻（カント・ヘーゲル）</div>
+        <div class="prog-bg"><div class="prog-fill fill-blue" style="width:20%"></div></div>
+        <div class="prog-pct">途中</div>
+      </div>
+      <div class="prog-item">
+        <div class="prog-label">自分の文章（構造に守られたカオス）</div>
+        <div class="prog-bg"><div class="prog-fill fill-green" style="width:70%"></div></div>
+        <div class="prog-pct">Ver4.2</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 学習設計 -->
+  <div class="sec">
+    <div class="sec-title">学習設計</div>
+    <div class="plan">
+      <div class="prog-title" style="margin-bottom:14px">週次サイクル</div>
+
+      <div class="plan-row">
+        <div class="plan-dot c-amber">朝</div>
+        <div class="plan-content">
+          <div class="plan-title">平日：コーヒーを入れたら本を開く（20分）</div>
+          <div class="plan-body">7時半〜8時の間。タイマーをセット。読む量は問わない。読み終わったらスマホのメモに一行書く（2分）。</div>
+        </div>
+      </div>
+
+      <div class="plan-row">
+        <div class="plan-dot c-blue">休日</div>
+        <div class="plan-content">
+          <div class="plan-title">45分読む → 15分書く</div>
+          <div class="plan-body">10時〜11時の間。読んだ内容と自分の経験を繋げる断片を書く。完成させなくていい。</div>
+        </div>
+      </div>
+
+      <div class="plan-row">
+        <div class="plan-dot c-green">週次</div>
+        <div class="plan-content">
+          <div class="plan-title">ここに気づきを持ってくる</div>
+          <div class="plan-body">「今週読んで引っかかった箇所」「書いた断片」を持ってくる。対話して図解をアップデートする。</div>
+        </div>
+      </div>
+
+      <div class="plan-row">
+        <div class="plan-dot c-purple">図解</div>
+        <div class="plan-content">
+          <div class="plan-title">読む → 気づく → 図解をアップデートする</div>
+          <div class="plan-body">新しい繋がりに気づいたら接続を追加。説明が薄いと感じたら内容を深める。違うと感じた繋がりは削除・修正する。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 核心的なテーマ -->
+  <div class="sec">
+    <div class="sec-title">あなたの文章の核心テーマと哲学の接続</div>
+
+    <div class="insight">
+      <div class="insight-body"><strong>「ラベリング不可能な悲しみ」</strong>——ベルクソンの直接与件。診断名（双極性障害）という空間化されたラベルではなく、毎回固有の質的な状態として経験される悲しみ。</div>
+      <span class="insight-tag c-amber">ベルクソン：直接与件</span>
+    </div>
+
+    <div class="insight">
+      <div class="insight-body"><strong>「安全なカオス・傘とカオス」</strong>——ドゥルーズ＝ガタリ「傘に穴を開けてカオスの一撃を通すことで創造が生まれる」。完全な秩序でも完全なカオスでもなく、穴の開いた傘として存在すること。</div>
+      <span class="insight-tag c-amber">ドゥルーズ：傘とカオス</span>
+      <span class="insight-tag c-amber">リトルネロ</span>
+    </div>
+
+    <div class="insight">
+      <div class="insight-body"><strong>「逃走とは弱さではない」</strong>——ニーチェ的な区別。怨恨（弱さ）からの逃走ではなく、新しい価値を創造するための逃走（能動的な力）。ドゥルーズの「逃走線（ligne de fuite）」は流れ出る運動。</div>
+      <span class="insight-tag c-coral">ニーチェ：力への意志</span>
+      <span class="insight-tag c-amber">ドゥルーズ：逃走線</span>
+    </div>
+
+    <div class="insight">
+      <div class="insight-body"><strong>「躁鬱の波は止揚されない」</strong>——ヘーゲル的な「苦しみはいつか意味を持つ（止揚）」ではなく、ドゥルーズ的な「差異として繰り返す——毎回固有の差異を持つ波を、目的なく肯定する」。</div>
+      <span class="insight-tag c-amber">ドゥルーズ：差異と反復</span>
+      <span class="insight-tag" style="background:#FCEBEB;color:#791F1F">ヘーゲル（対立）</span>
+    </div>
+
+    <div class="insight">
+      <div class="insight-body"><strong>「身体の芯が冷えていく感覚」</strong>——メルロ＝ポンティの「生きられた身体（corps vécu）」。診断名ではなく身体の直接与件として書く——これはすでにベルクソン的・メルロ＝ポンティ的な書き方だった。</div>
+      <span class="insight-tag c-teal">メルロ＝ポンティ：生きられた身体</span>
+      <span class="insight-tag c-amber">ベルクソン：直接与件</span>
+    </div>
+  </div>
+
+  <!-- 次のステップ -->
+  <div class="sec">
+    <div class="sec-title">次のステップ</div>
+    <div class="plan">
+      <div class="plan-row">
+        <div class="plan-dot c-amber">①</div>
+        <div class="plan-content">
+          <div class="plan-title">ベルクソン入門 第2章へ進む</div>
+          <div class="plan-body">「物質と記憶」——二種類の記憶と逆円錐。「純粋な過去は消えない」という命題がドゥルーズの「潜在性」に直結する。</div>
+        </div>
+      </div>
+      <div class="plan-row">
+        <div class="plan-dot c-green">②</div>
+        <div class="plan-content">
+          <div class="plan-title">「ラベリング不可能な悲しみ」を文章に書く</div>
+          <div class="plan-body">今日の気づきを、自分の文章の「はじめに」に組み込む試み。ベルクソンの言葉は使わなくていい。経験だけを書く。</div>
+        </div>
+      </div>
+      <div class="plan-row">
+        <div class="plan-dot c-purple">③</div>
+        <div class="plan-content">
+          <div class="plan-title">週次報告をここに持ってくる</div>
+          <div class="plan-body">読んで引っかかったこと・書いた断片・新しい繋がりの気づきを持ってくる。図解をアップデートする。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

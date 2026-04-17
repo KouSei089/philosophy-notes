@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>哲学史 影響マップ</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, 'Hiragino Sans', 'Yu Gothic', sans-serif; background: #f5f4f0; color: #1a1a1a; }
+
+.header { padding: 14px 16px 10px; background: #fff; border-bottom: 1px solid #e0ddd8; }
+.header h1 { font-size: 16px; font-weight: 600; color: #111; }
+.header p { font-size: 11px; color: #888; margin-top: 3px; }
+
+.scroll-hint { font-size: 11px; color: #aaa; text-align: center; padding: 5px 0 2px; background: #fff; }
+
+.map-wrap { overflow-x: auto; overflow-y: hidden; background: #fff; border-bottom: 1px solid #e0ddd8; cursor: grab; -webkit-overflow-scrolling: touch; }
+.map-wrap:active { cursor: grabbing; }
+#map { display: block; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 8px 14px; padding: 10px 16px; background: #fff; border-bottom: 1px solid #e0ddd8; }
+.li { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #555; }
+.ld { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.ll { width: 22px; height: 2px; flex-shrink: 0; }
+.ll.dashed { background: repeating-linear-gradient(90deg, currentColor 0, currentColor 3px, transparent 3px, transparent 6px); }
+
+.detail-wrap { padding: 14px; }
+.detail-card { background: #fff; border-radius: 12px; padding: 16px; border: 1px solid #e8e5e0; }
+.d-name { font-size: 18px; font-weight: 700; color: #111; display: inline; }
+.d-dates { font-size: 12px; color: #999; margin-left: 6px; }
+.d-vol { display: inline-block; font-size: 10px; padding: 2px 7px; border-radius: 10px; background: #FAEEDA; color: #633806; font-weight: 600; margin-left: 6px; vertical-align: middle; }
+.d-sec { margin-top: 13px; }
+.d-label { font-size: 10px; font-weight: 700; color: #aaa; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 5px; }
+.d-text { font-size: 14px; color: #333; line-height: 1.8; }
+.d-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.d-tag { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: #f0ede8; color: #555; }
+.d-works { font-size: 13px; color: #666; line-height: 1.65; margin-top: 4px; }
+.d-dlz { margin-top: 13px; padding: 12px 14px; border-radius: 8px; background: #FEFAF2; border-left: 3px solid #EF9F27; }
+.d-dlz-label { font-size: 10px; font-weight: 700; color: #BA7517; letter-spacing: 0.06em; margin-bottom: 6px; }
+.d-dlz-text { font-size: 14px; color: #333; line-height: 1.8; }
+.d-hint { font-size: 14px; color: #bbb; text-align: center; padding: 40px 20px; }
+
+.node-circle { transition: opacity 0.15s; cursor: pointer; }
+.node-circle:hover { opacity: 0.85; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>哲学史 影響マップ</h1>
+  <p>ドゥルーズへと流れ込む思想の地図 ／ 哲学者をタップして詳細を読む</p>
+</div>
+<div class="scroll-hint">← 左右にスクロールできます →</div>
+
+<div class="map-wrap">
+  <svg id="map" width="2160" height="445" viewBox="0 0 2160 445" xmlns="http://www.w3.org/2000/svg"></svg>
+</div>
+
+<div class="legend">
+  <div class="li"><div class="ld" style="background:#7F77DD"></div>ドゥルーズへの主要影響</div>
+  <div class="li"><div class="ld" style="background:#D85A30"></div>批判対象・論敵</div>
+  <div class="li"><div class="ld" style="background:#1D9E75"></div>文脈・間接影響</div>
+  <div class="li"><div class="ld" style="background:#888780"></div>背景</div>
+  <div class="li"><div class="ld" style="background:#EF9F27"></div>ドゥルーズ本人</div>
+  <div class="li"><div class="ld" style="background:#639922"></div>あなた</div>
+  <div style="width:100%;height:0;flex-basis:100%"></div>
+  <div class="li"><div class="ll" style="background:#7F77DD;height:3px"></div>強い正の影響</div>
+  <div class="li"><div class="ll dashed" style="color:#E24B4A"></div>批判・対立</div>
+  <div class="li"><div class="ll" style="background:#EF9F27;height:2px"></div>批判的受容</div>
+  <div class="li"><div class="ll dashed" style="color:#B4B2A9"></div>間接的影響</div>
+</div>
+
+<div class="detail-wrap">
+  <div class="detail-card" id="detail">
+    <div class="d-hint">哲学者をタップすると詳細が表示されます</div>
+  </div>
+</div>
+
+<script>
+const R = 21;
+
+const PHILS = {
+  heraclitus: { name:'ヘラクレイトス', dates:'BC 535', x:95, y:245, type:'teal', vol:1,
+    bio:'「万物は流転する」——変化と差異を哲学の根本に置いた最初の思想家。対立物の統一と絶え間ない生成を説いた。著作は断片のみ現存する。',
+    keys:['万物流転','差異と生成','対立の調和','ロゴス'],
+    works:'断片（現存するもののみ）',
+    dlz:'「差異の哲学」の最初の声。「同じ川には二度と入れない」という直感は、ニーチェを経由してドゥルーズの差異論へと流れ込む。プラトンが「変化は幻想だ」と言ったのへの根本的な対抗軸として、ドゥルーズはヘラクレイトスを参照し続けた。'},
+
+  plato: { name:'プラトン', dates:'BC 427', x:160, y:110, type:'coral', vol:1,
+    bio:'イデア（真の実在）と現象（コピー）の二元論を確立した哲学の祖。シミュラークル（コピーのコピー）を最下層に排除した。西洋哲学の「主流」を作った人物。',
+    keys:['イデア論','二世界論','洞窟の比喩','シミュラークル排除'],
+    works:'国家 / パイドン / 饗宴 / テアイテトス',
+    dlz:'「プラトンを逆転させること（renverser le platonisme）」——これがドゥルーズ哲学の最初の宣言。プラトンが排除したシミュラークルこそ一次的なものだとドゥルーズは言う。最大の批判対象であり、逆説的に哲学的対話の最重要相手。'},
+
+  aristotle: { name:'アリストテレス', dates:'BC 384', x:220, y:140, type:'gray', vol:1,
+    bio:'プラトンの弟子でありながら師のイデア論を否定。論理学・形而上学・倫理学・生物学を体系化し、西洋学問の標準的枠組みを作った人物。',
+    keys:['形而上学','三段論法','四原因説','カテゴリー'],
+    works:'形而上学 / ニコマコス倫理学 / 政治学',
+    dlz:'直接の影響は薄いが、アリストテレスが確立した「同一性・類似・対立・矛盾」の概念的枠組みがドゥルーズの批判する「表象の哲学」の基礎となっている。'},
+
+  stoics: { name:'ストア派', dates:'BC 300', x:265, y:325, type:'teal', vol:2,
+    bio:'「自然（ロゴス）に従って生きよ」。出来事を物体とは別の「非物体的なもの」として分析したストア哲学は、意外にもドゥルーズの出来事論へと直結する。',
+    keys:['出来事（エヴェネマン）','非物体的なもの','アパテイア','ロゴス'],
+    works:'エピクテトス「語録」/ マルクス・アウレリウス「自省録」',
+    dlz:'「出来事の哲学」の直接の先祖。ドゥルーズは『意味の論理学』でストア派の「出来事は物体でも言語でもない第三の次元にある」という分析を現代に蘇らせる。「起きたことをそのまま意志する」というストア的な倫理もドゥルーズの肯定の哲学と通底する。'},
+
+  plotinus: { name:'プロティノス', dates:'204', x:325, y:135, type:'gray', vol:2,
+    bio:'新プラトン主義の創始者。「一者」からすべてが流出するという神秘主義的体系を構築。プラトンを発展させ、中世キリスト教哲学への橋渡し。',
+    keys:['一者（ト・ヘン）','流出説','神秘的合一'],
+    works:'エンネアデス',
+    dlz:'「すべては一者の表現だ」という一元論的直感がスピノザの「一実体論」の先祖。スピノザを経由してドゥルーズの内在性の哲学へと遠く繋がる。'},
+
+  augustine: { name:'アウグスティヌス', dates:'354', x:400, y:110, type:'gray', vol:3,
+    bio:'西洋最初の自伝的哲学書『告白』を書いた人。時間論・記憶論・意志論を内面の観察から展開した。「私たちの心はあなたの中に安らうまで安らわない」。',
+    keys:['時間論','記憶論','恩寵と自由意志'],
+    works:'告白 / 神の国',
+    dlz:'「過去は記憶として、未来は予期として、現在のみが実在する」という三重の現在の時間論が、フッサール・ベルクソンを経てドゥルーズの時間論へと連なる遠い先祖。'},
+
+  scotus: { name:'スコトゥス', dates:'1266', x:488, y:245, type:'purple', vol:3,
+    bio:'「存在の一義性」を提唱した中世の哲学者。神も人間も草も石も、あらゆる存在が「同じ意味で存在する」という革命的な主張。存在に階層がない。',
+    keys:['存在の一義性','内在性の先駆','ハエセイタス（個体性原理）'],
+    works:'オルディナティオ（命題集注解）',
+    dlz:'ドゥルーズが『差異と反復』で「存在の一義性の最初の表明者」として高く評価した人物。スコトゥス→スピノザ→ニーチェ→ドゥルーズという「存在の一義性の系譜」をドゥルーズ自身が描いた。ドゥルーズの「内在性の平面」の哲学的先祖。'},
+
+  ockham: { name:'オッカム', dates:'1287', x:545, y:325, type:'teal', vol:3,
+    bio:'「オッカムの剃刀」——存在は必要以上に増やされてはならない。「人間」という普遍概念は実在せず、ソクラテスという個体のみが実在するという唯名論。',
+    keys:['オッカムの剃刀','唯名論','個体の優先'],
+    works:'ソーマ・ロジカエ',
+    dlz:'唯名論（個体だけが実在する）がヒュームの経験論へ、さらにドゥルーズの「差異は一般性に先立つ」という命題へとつながる。「普遍より個が先だ」という直感の哲学史的源泉。'},
+
+  bruno: { name:'ブルーノ', dates:'1548', x:638, y:325, type:'teal', vol:4,
+    bio:'無限宇宙論を唱え宗教裁判で火刑に処された哲学者。「神は宇宙の外にいるのではなく宇宙そのものに内在する」という汎神論。超越的神の否定。',
+    keys:['無限宇宙論','汎神論','内在性の先駆'],
+    works:'原因・原理・一者について',
+    dlz:'ブルーノの汎神論→スピノザの「神すなわち自然」→ドゥルーズの「内在性の平面」という「内在性の地下水脈」の最初の流れ。火刑に処されてまで超越的神を否定した先駆者。'},
+
+  descartes: { name:'デカルト', dates:'1596', x:720, y:110, type:'gray', vol:5,
+    bio:'「我思う、ゆえに我あり」——哲学の出発点を神から考える主体へと移した近代哲学の父。精神と身体を別の実体とする心身二元論を打ち立てた。',
+    keys:['コギト','心身二元論','方法的懐疑','機械論的自然観'],
+    works:'省察 / 方法序説 / 哲学の原理',
+    dlz:'ドゥルーズはデカルト的な「考える主体（コギト）」を根本から批判する。「主体は経験に先立って与えられるのではなく、差異と生成のプロセスの産物だ」——スピノザによるデカルト二元論の一元論的解体が、ドゥルーズへの橋渡し。'},
+
+  spinoza: { name:'スピノザ', dates:'1632', x:800, y:245, type:'purple', vol:5,
+    bio:'ドゥルーズが「哲学の王子」と呼んだ人物。「神すなわち自然」——すべては一つの実体の表現であり、精神と身体はその二属性。コナトゥス（存在を強化する努力）と感情の幾何学的分析。',
+    keys:['神すなわち自然','一実体論','コナトゥス','情動論','内在性の哲学'],
+    works:'エチカ（幾何学的方法で書かれた倫理学） / 知性改善論',
+    dlz:'ドゥルーズ哲学の最重要源泉。内在性の平面、コナトゥス→力への意志→欲望、情動の倫理学（喜びは力を増大させ悲しみは減少させる）——これらすべてがスピノザから流れ込む。あなたの「窒息する感覚」と「江ノ島で解放される感覚」の差異はまさにスピノザの情動論で語れる。'},
+
+  leibniz: { name:'ライプニッツ', dates:'1646', x:865, y:325, type:'purple', vol:5,
+    bio:'微分積分の発明者。哲学ではモナド（窓のない精神的単子）論と予定調和。「世界は無限の折り畳み（プリ）からなる」というバロック的なビジョン。',
+    keys:['モナド論','予定調和','微分','襞（pli）','潜在性'],
+    works:'モナドロジー / 形而上学序説',
+    dlz:'ドゥルーズは晩年の著作『襞——ライプニッツとバロック』でライプニッツを詳細に論じる。「世界は無限に折りたたまれた差異からなる」という発想が「差異と反復」の「潜在的なもの（virtuel）」へとつながる。'},
+
+  hume: { name:'ヒューム', dates:'1711', x:950, y:245, type:'purple', vol:6,
+    bio:'ドゥルーズが最初の著作を捧げた人。「因果関係も自己も、実は習慣に過ぎない」——経験論を極限まで推し進め、固定した自己という幻想を解体した。',
+    keys:['因果関係の批判','自己の束理論','習慣と連合','理性は情念の奴隷'],
+    works:'人間本性論 / 人間知性研究',
+    dlz:'ドゥルーズの最初の著作は『経験論と主体性』（1953）というヒューム論。「主体は先に与えられるのではなく、習慣と連合の過程の中で構成される効果に過ぎない」——この発想がドゥルーズの「主体なき哲学」の原点。「理性は情念の奴隷だ」という命題は欲望の哲学へとつながる。'},
+
+  kant: { name:'カント', dates:'1724', x:1030, y:110, type:'amber-light', vol:7,
+    bio:'「物自体は認識できない」「認識形式（時間・空間・カテゴリー）は人間の側にある」——批判哲学によって合理論と経験論を統合したコペルニクス的転回。三批判書を著した。',
+    keys:['物自体','コペルニクス的転回','超越論的観念論','三批判書','純粋理性批判'],
+    works:'純粋理性批判 / 実践理性批判 / 判断力批判',
+    dlz:'ドゥルーズは『カントの批判哲学』を著し、深く受け継ぎながら批判する。「超越論的な条件を問う」という発想は受け継ぐが、「その条件を同一性ではなく差異において設定する」という超越論的経験論へと変容させる。ユクスキュル「環世界」との接続点もここにある。'},
+
+  hegel: { name:'ヘーゲル', dates:'1770', x:1095, y:110, type:'coral', vol:7,
+    bio:'「弁証法（対立→止揚→統合）」「絶対精神の自己展開としての歴史」——ドイツ観念論の頂点にして、ドゥルーズが正面から批判した最大の論敵。',
+    keys:['弁証法','絶対精神','否定の否定','アウフヘーベン','歴史の目的論'],
+    works:'精神現象学 / 論理学 / 法の哲学',
+    dlz:'ドゥルーズの主著『差異と反復』はヘーゲルへの哲学的宣戦布告として読める。「差異を矛盾として否定的に処理し、より高次の同一性へ回収する」弁証法に対し、「差異は肯定的な力だ、矛盾に還元されない」と根本的に反論する。あなたの文章で「苦しみがいつか意味を持つ」という思考はヘーゲル的であり、ドゥルーズはそれを否定する。'},
+
+  schelling: { name:'シェリング', dates:'1775', x:1145, y:192, type:'gray', vol:7,
+    bio:'カントとヘーゲルの間に位置するドイツ観念論の哲学者。自然哲学と後期の「暗い根底（Ungrund）」——理性では把握できない存在の深みを提起。',
+    keys:['自然哲学','暗い根底（Ungrund）','同一性哲学'],
+    works:'人間的自由の本質 / 世界時代',
+    dlz:'後期シェリングの「暗い根底」——理性的に把握できない実存の深み——はドゥルーズが『差異と反復』で展開する「潜在的なもの（virtuel）」の概念に先行する発想。ヘーゲル的な「透明な理性の体系」への批判という点で通底する。'},
+
+  schopenhauer: { name:'ショーペン', dates:'1788', x:1185, y:325, type:'teal', vol:9,
+    bio:'「世界の本質は盲目的な意志だ」という悲観主義哲学。カントの物自体を「意志」として解釈。ニーチェの出発点となり、後にニーチェが強く反発した相手。',
+    keys:['世界意志','悲観主義','意志の否定','芸術による救済'],
+    works:'意志と表象としての世界',
+    dlz:'ドゥルーズへの影響はショーペンハウアー→ニーチェ→ドゥルーズという間接的ルートで伝わる。「否定（苦行・諦観）から肯定（力への意志）へ」というニーチェの逆転を通じて、ドゥルーズの「肯定の哲学」の背景をなしている。'},
+
+  marx: { name:'マルクス', dates:'1818', x:1265, y:360, type:'teal', vol:8,
+    bio:'「哲学者は世界を解釈してきたが、重要なのは変えることだ」。資本論・唯物史観・剰余価値論。ヘーゲル弁証法を観念から物質へ逆転させた。',
+    keys:['唯物史観','剰余価値','疎外','資本主義批判'],
+    works:'資本論 / 経済学・哲学草稿 / フォイエルバッハ・テーゼ',
+    dlz:'ドゥルーズ＝ガタリの『アンチ・オイディプス』は「マルクス＋フロイト」の企図として書かれた。資本主義分析に欲望論を接続し「なぜ人々は自分を抑圧する権力を欲望するのか」を問う。あなたの「窒息する仕事環境」の構造的分析にも使える。'},
+
+  nietzsche: { name:'ニーチェ', dates:'1844', x:1372, y:245, type:'purple', vol:9,
+    bio:'「神は死んだ」「力への意志」「永劫回帰」——ヘーゲル的な目的論的歴史観を破壊し、「肯定の哲学」を打ち立てた。ドゥルーズが初期代表作を捧げた人。',
+    keys:['神は死んだ','永劫回帰','力への意志','超人','ニヒリズムの克服'],
+    works:'ツァラトゥストラはこう語った / 善悪の彼岸 / 道徳の系譜 / 悦ばしき知識',
+    dlz:'初期代表作『ニーチェと哲学』（1962）でドゥルーズはニーチェをヘーゲルへの対抗として読む。「永劫回帰＝差異の永遠回帰（同一なものの回帰ではない）」という解釈はドゥルーズの独創。あなたの文章の「逃走」テーマとニーチェ的な「強さからの逃走（新しい価値創造のための）」は深くつながる。'},
+
+  bergson: { name:'ベルクソン', dates:'1859', x:1440, y:245, type:'purple', vol:12,
+    bio:'「持続（durée）」——時間を空間的な点の連続として理解することへの批判。本当の時間は質的に変化し続ける流れだ。差異と生命の躍動の哲学者。',
+    keys:['持続（durée）','生の躍動（élan vital）','記憶論','潜在性','差異化'],
+    works:'時間と自由 / 物質と記憶 / 創造的進化',
+    dlz:'ドゥルーズが最も多く論じた哲学者の一人。『ベルクソニズム』（1966）、映画論でもベルクソンの時間論を軸にする。「差異は比較によって生まれるのではなく、内的な差異化のプロセスそのものだ」——この発想が『差異と反復』の核心。'},
+
+  husserl: { name:'フッサール', dates:'1859', x:1485, y:110, type:'teal', vol:10,
+    bio:'現象学の創始者。「すべての意識は何かについての意識だ（志向性）」。エポケー（判断停止）によって経験そのものを先入観なしに記述しようとした。',
+    keys:['志向性','エポケー','超越論的自我','生活世界'],
+    works:'論理学研究 / イデーン / ヨーロッパ諸学の危機',
+    dlz:'ドゥルーズは「超越論的経験論」によってフッサールを批判的に乗り越える。「フッサールはまだ主体（超越論的自我）を前提にしている」——主体に先立つ非人称的な差異と生成の場を記述することがドゥルーズの企図。'},
+
+  heidegger: { name:'ハイデガー', dates:'1889', x:1572, y:135, type:'teal', vol:10,
+    bio:'「存在と時間」——「なぜ何かがあって、何もないのではないのか」という存在論的問い。現存在（Dasein）は世界の中に投げ込まれ、道具連関の中に生きている。',
+    keys:['現存在（Dasein）','存在と時間','世界内存在','本来性','死への存在'],
+    works:'存在と時間',
+    dlz:'ドゥルーズはハイデガーと対話しながら異なる方向に向かう。ハイデガーの「存在論的差異（存在と存在者の差異）」に対し、ドゥルーズは「差異そのものを存在として肯定する」という別の差異論を構築する。'},
+
+  sartre: { name:'サルトル', dates:'1905', x:1655, y:110, type:'coral', vol:12,
+    bio:'「実存は本質に先立つ」——人間は先に本質があって作られるのではなく、まず実存し、自由に自己を作り出す。「自由の刑に処されている」という逆説。',
+    keys:['実存主義','自由の刑','対自存在と即自存在','他者の視線'],
+    works:'存在と無 / 実存主義はヒューマニズムである',
+    dlz:'「自由な主体」というサルトル的概念に対し、ドゥルーズは「主体に先立つ非人称的な差異のプロセス」を置く。「サルトルは主体を解放しようとした、私は主体を解体しようとする」——これがドゥルーズの世代的な立場。'},
+
+  foucault: { name:'フーコー', dates:'1926', x:1748, y:325, type:'purple', vol:12,
+    bio:'ドゥルーズの親友。権力と知識の関係、規律権力（監獄・病院・学校）、主体の系譜学。「権力は上から押しつけられるのではなく毛細血管のように社会全体に浸透する」。',
+    keys:['規律権力','知と権力','主体の系譜学','生権力','監獄の誕生'],
+    works:'監獄の誕生 / 言葉と物 / 性の歴史',
+    dlz:'「フーコーにおける折り返し（プリ）」論文でドゥルーズはフーコーを深く論じる。「欲望は権力に対して一次的だ」というドゥルーズの主張はフーコーの権力論への応答でもある。相互に影響し合った同時代の最重要の対話者。'},
+
+  deleuze: { name:'ドゥルーズ', dates:'1925', x:1875, y:245, type:'amber', vol:12,
+    bio:'哲学史の「地下の流れ」——スピノザ・ヒューム・ニーチェ・ベルクソン——を掘り起こし、プラトンとヘーゲルの「主流」に対抗する哲学史を描いた人。「差異こそが根本だ」。',
+    keys:['差異と反復','内在性の平面','リゾーム','器官なき身体','脱領土化','リトルネロ','傘とカオス'],
+    works:'差異と反復 / 意味の論理学 / アンチ・オイディプス（G）/ 千のプラトー（G）/ 哲学とは何か（G）',
+    dlz:'すべての哲学史の流れがここに収束する。「差異は否定ではなく肯定だ」「主体に先立つ生成がある」「内在性の平面は超越的な審級を必要としない」——これらがプラトン・ヘーゲルへの根本的な応答。あなたの文章はこの哲学史の延長線上にある。'},
+
+  you: { name:'あなた', dates:'現在', x:2055, y:245, type:'green', vol:null,
+    bio:'躁鬱という臨床的な個人の経験から哲学的概念を作ろうとしている。「構造に守られたカオス」「スリットの入った傘」——これはドゥルーズが言った「哲学とは概念の創造だ」を生きることだ。',
+    keys:['構造に守られたカオス','リトルネロの実践','環世界の複数性','逃走の倫理学'],
+    works:'あなたの文章（進行中）',
+    dlz:'ドゥルーズの哲学史的企図——「個人的な問題（プロブレーム）から概念を作る」——をあなたはすでに実践している。哲学史を学ぶことは、その実践に名前と系譜を与えることだ。モンテーニュが16世紀にやったこと、ドゥルーズが20世紀にやったこと、あなたが今やっていること——それは同じ身振りだ。'}
+};
+
+const ARROWS = [
+  // KEY positive (thick purple, solid) - main Deleuzian lineage
+  { f:'spinoza',   t:'deleuze', type:'key',     label:'内在性の平面', arc: 125 },
+  { f:'hume',      t:'deleuze', type:'key',     label:'主体の解体',   arc: 108 },
+  { f:'nietzsche', t:'deleuze', type:'key',     label:'差異の肯定',   arc:  70 },
+  { f:'bergson',   t:'deleuze', type:'key',     label:'持続・差異化', arc:  55 },
+  { f:'leibniz',   t:'deleuze', type:'key',     label:'襞・潜在性',   arc: 148 },
+
+  // Positive (medium purple)
+  { f:'heraclitus',t:'nietzsche',type:'positive',label:'差異・生成',  arc:  95 },
+  { f:'scotus',    t:'spinoza',  type:'positive',label:'存在の一義性',arc:  55 },
+  { f:'spinoza',   t:'nietzsche',type:'positive',label:'内在性・肯定',arc:  90 },
+  { f:'foucault',  t:'deleuze',  type:'positive',label:'相互影響',    arc:  55 },
+
+  // Critical reception (amber - received but transforms)
+  { f:'kant',   t:'deleuze', type:'crit-recv', label:'超越論的方法', arc: -110 },
+
+  // Opposition (red dashed - Deleuze critiques these)
+  { f:'plato',  t:'deleuze', type:'oppose',    label:'逆転の対象',   arc: -140 },
+  { f:'hegel',  t:'deleuze', type:'oppose',    label:'弁証法批判',   arc: -115 },
+
+  // Indirect (gray dashed)
+  { f:'plato',       t:'plotinus',  type:'indirect', label:'',         arc: -42 },
+  { f:'ockham',      t:'hume',      type:'indirect', label:'唯名論',    arc:  62 },
+  { f:'bruno',       t:'spinoza',   type:'indirect', label:'汎神論',    arc:  52 },
+  { f:'descartes',   t:'kant',      type:'indirect', label:'',         arc:  58 },
+  { f:'hume',        t:'kant',      type:'indirect', label:'独断打破',  arc: -52 },
+  { f:'kant',        t:'hegel',     type:'indirect', label:'',         arc: -38 },
+  { f:'schopenhauer',t:'nietzsche', type:'indirect', label:'意志論',    arc:  68 },
+  { f:'marx',        t:'deleuze',   type:'indirect', label:'資本主義論', arc: 162 },
+  { f:'husserl',     t:'heidegger', type:'indirect', label:'',         arc: -42 },
+  { f:'stoics',      t:'deleuze',   type:'indirect', label:'出来事論',  arc: 185 },
+
+  // You
+  { f:'deleuze', t:'you', type:'you', label:'', arc: 45 },
+];
+
+// ─── color lookup ────────────────────────────────────────────────
+const NODE_COLORS = {
+  purple:      { fill:'#7F77DD', stroke:'#534AB7', text:'#1a1860' },
+  coral:       { fill:'#F0997B', stroke:'#D85A30', text:'#4A1B0C' },
+  teal:        { fill:'#5DCAA5', stroke:'#1D9E75', text:'#04342C' },
+  gray:        { fill:'#B4B2A9', stroke:'#888780', text:'#2C2C2A' },
+  amber:       { fill:'#EF9F27', stroke:'#BA7517', text:'#412402' },
+  'amber-light':{ fill:'#FAC775', stroke:'#BA7517', text:'#412402' },
+  green:       { fill:'#97C459', stroke:'#639922', text:'#173404' },
+};
+const ARROW_STYLE = {
+  key:        { stroke:'#7F77DD', width:3,   dash:'none' },
+  positive:   { stroke:'#AFA9EC', width:2,   dash:'none' },
+  'crit-recv':{ stroke:'#EF9F27', width:2,   dash:'none' },
+  oppose:     { stroke:'#E24B4A', width:1.5, dash:'6,4'  },
+  indirect:   { stroke:'#C4C2BA', width:1.2, dash:'5,4'  },
+  you:        { stroke:'#97C459', width:2.5, dash:'none' },
+};
+
+// ─── era band definitions ──────────────────────────────────────
+const ERAS = [
+  { label:'古代',        x1:55,   x2:360,  color:'#F0EEFE' },
+  { label:'中世',        x1:360,  x2:515,  color:'#E8F6F0' },
+  { label:'ルネサンス',  x1:515,  x2:668,  color:'#FEF2EA' },
+  { label:'17世紀',     x1:668,  x2:892,  color:'#EAF1FD' },
+  { label:'18世紀',     x1:892,  x2:1065, color:'#ECF7E4' },
+  { label:'19世紀',     x1:1065, x2:1432, color:'#FEF8E8' },
+  { label:'20世紀',     x1:1432, x2:1955, color:'#EEE8FD' },
+  { label:'現在',       x1:1955, x2:2105, color:'#E8F6EA' },
+];
+
+// ─── helpers ─────────────────────────────────────────────────────
+function f(n) { return (+n).toFixed(1); }
+
+function qbez(id1, id2, arc) {
+  const p1 = PHILS[id1], p2 = PHILS[id2];
+  const dx = p2.x - p1.x, dy = p2.y - p1.y;
+  const len = Math.sqrt(dx*dx + dy*dy);
+  const ux = dx/len, uy = dy/len;
+  const sx = p1.x + ux*R, sy = p1.y + uy*R;
+  const ex = p2.x - ux*R, ey = p2.y - uy*R;
+  const mx = (sx+ex)/2, my = (sy+ey)/2;
+  const cx = mx, cy = my + arc;
+  // midpoint on bezier at t=0.5
+  const bx = 0.25*sx + 0.5*cx + 0.25*ex;
+  const by = 0.25*sy + 0.5*cy + 0.25*ey;
+  return {
+    d: `M${f(sx)},${f(sy)} Q${f(cx)},${f(cy)} ${f(ex)},${f(ey)}`,
+    lx: bx, ly: by
+  };
+}
+
+// ─── render ───────────────────────────────────────────────────────
+function renderMap() {
+  let s = '';
+
+  // defs
+  s += '<defs>';
+  const markers = [
+    ['mkey',  '#7F77DD', 4],
+    ['mpos',  '#AFA9EC', 4],
+    ['mcr',   '#EF9F27', 4],
+    ['mopp',  '#E24B4A', 4],
+    ['mind',  '#C4C2BA', 4],
+    ['myou',  '#97C459', 4],
+  ];
+  markers.forEach(([id, col, sw]) => {
+    s += `<marker id="${id}" viewBox="0 0 12 10" refX="10" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M0,1 L10,5 L0,9" fill="none" stroke="${col}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>`;
+  });
+  s += '</defs>';
+
+  // era bands
+  ERAS.forEach(e => {
+    s += `<rect x="${e.x1}" y="0" width="${e.x2-e.x1}" height="405" fill="${e.color}" opacity="0.9"/>`;
+    s += `<text x="${(e.x1+e.x2)/2}" y="16" text-anchor="middle" font-size="10" fill="#bbb" font-family="-apple-system,'Hiragino Sans',sans-serif">${e.label}</text>`;
+  });
+
+  // timeline axis
+  s += `<line x1="55" y1="404" x2="2105" y2="404" stroke="#ddd" stroke-width="0.8"/>`;
+
+  // arrows (drawn first, under nodes)
+  ARROWS.forEach(a => {
+    const sty = ARROW_STYLE[a.type] || ARROW_STYLE.indirect;
+    const markerMap = { key:'mkey', positive:'mpos', 'crit-recv':'mcr', oppose:'mopp', indirect:'mind', you:'myou' };
+    const mid = qbez(a.f, a.t, a.arc);
+    s += `<path d="${mid.d}" fill="none" stroke="${sty.stroke}" stroke-width="${sty.width}" stroke-dasharray="${sty.dash}" marker-end="url(#${markerMap[a.type] || 'mind'})" opacity="${a.type === 'indirect' ? 0.6 : 0.85}"/>`;
+    if (a.label) {
+      s += `<text x="${f(mid.lx)}" y="${f(mid.ly - 3)}" text-anchor="middle" font-size="9" fill="${sty.stroke}" opacity="0.9" font-family="-apple-system,'Hiragino Sans',sans-serif">${a.label}</text>`;
+    }
+  });
+
+  // nodes + labels
+  Object.entries(PHILS).forEach(([id, p]) => {
+    const c = NODE_COLORS[p.type] || NODE_COLORS.gray;
+    s += `<g class="node-circle" data-id="${id}" onclick="showDetail('${id}')">
+      <circle cx="${p.x}" cy="${p.y}" r="${R}" fill="${c.fill}" stroke="${c.stroke}" stroke-width="1.5"/>
+      <text x="${p.x}" y="${p.y + 2}" text-anchor="middle" dominant-baseline="middle" font-size="8.5" font-weight="600" fill="${c.text}" font-family="-apple-system,'Hiragino Sans',sans-serif">${p.name.length > 5 ? p.name.slice(0,5) : p.name}</text>
+      <text x="${p.x}" y="${p.y + R + 11}" text-anchor="middle" font-size="10" fill="#333" font-family="-apple-system,'Hiragino Sans',sans-serif">${p.name}</text>
+      <text x="${p.x}" y="${p.y + R + 21}" text-anchor="middle" font-size="9" fill="#aaa" font-family="-apple-system,'Hiragino Sans',sans-serif">${p.dates}</text>
+    </g>`;
+  });
+
+  document.getElementById('map').innerHTML = s;
+}
+
+function showDetail(id) {
+  const p = PHILS[id];
+  const c = NODE_COLORS[p.type] || NODE_COLORS.gray;
+  const volBadge = p.vol ? `<span class="d-vol">第${p.vol}巻</span>` : '';
+  const tagsHtml = p.keys.map(k => `<span class="d-tag">${k}</span>`).join('');
+  document.getElementById('detail').innerHTML = `
+    <div>
+      <span class="d-name" style="color:${c.stroke}">${p.name}</span>
+      <span class="d-dates">${p.dates}</span>
+      ${volBadge}
+    </div>
+    <div class="d-sec">
+      <div class="d-label">概要</div>
+      <div class="d-text">${p.bio}</div>
+    </div>
+    <div class="d-sec">
+      <div class="d-label">キー概念</div>
+      <div class="d-tags">${tagsHtml}</div>
+    </div>
+    <div class="d-sec">
+      <div class="d-label">主著</div>
+      <div class="d-works">${p.works}</div>
+    </div>
+    <div class="d-dlz">
+      <div class="d-dlz-label">▶ ドゥルーズ・あなたの文章との繋がり</div>
+      <div class="d-dlz-text">${p.dlz}</div>
+    </div>
+  `;
+}
+
+renderMap();
+</script>
+</body>
+</html>
