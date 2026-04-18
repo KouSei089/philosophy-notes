@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>持続の記録 — 2026年4月18日</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background:#f5f4f0;color:#1a1a1a;padding-bottom:60px}
+
+/* ナビ */
+.nav{padding:14px 20px;background:#fff;border-bottom:1px solid #e0ddd8;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100}
+.nav-back{font-size:13px;color:#888;text-decoration:none;display:flex;align-items:center;gap:4px}
+.nav-back:hover{color:#333}
+.nav-back::before{content:"←";font-size:14px}
+.nav-divider{color:#ddd;font-size:13px}
+.nav-current{font-size:13px;color:#444;font-weight:500}
+
+/* ヘッダー */
+.hdr{padding:32px 20px 28px;background:#fff;border-bottom:1px solid #e0ddd8}
+.hdr-inner{max-width:680px;margin:0 auto}
+.hdr-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#BA7517;margin-bottom:10px}
+.hdr h1{font-size:26px;font-weight:700;line-height:1.35;color:#111;margin-bottom:14px}
+.hdr-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.meta-tag{font-size:12px;padding:3px 10px;border-radius:20px;font-weight:500}
+.hdr-theme{font-size:14px;color:#555;line-height:1.7;border-left:3px solid #EF9F27;padding-left:12px;margin-top:8px}
+
+/* 本文エリア */
+.wrap{max-width:680px;margin:0 auto;padding:24px 20px}
+
+/* セクション */
+.section{margin-bottom:36px}
+.section-num{font-size:11px;font-weight:700;letter-spacing:.1em;color:#aaa;text-transform:uppercase;margin-bottom:6px}
+.section-title{font-size:19px;font-weight:700;color:#111;margin-bottom:20px;padding-bottom:10px;border-bottom:1px solid #e8e5e0}
+.subsection{margin-bottom:24px}
+.subsection-title{font-size:14px;font-weight:700;color:#333;margin-bottom:10px;padding:6px 10px;background:#f0ede8;border-radius:6px}
+
+/* 本文テキスト */
+p{font-size:15px;line-height:1.9;color:#333;margin-bottom:14px}
+p:last-child{margin-bottom:0}
+
+/* 引用 */
+.quote{background:#FEFAF2;border-radius:12px;padding:16px 18px;margin:16px 0;border-left:4px solid #EF9F27}
+.quote p{font-size:14px;color:#333;line-height:1.85;font-style:italic;margin:0}
+
+/* 概念カード */
+.concept-card{background:#fff;border-radius:12px;padding:16px;margin:12px 0;border:1px solid #e8e5e0}
+.concept-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.concept-name{font-size:14px;font-weight:700;color:#111}
+.concept-author{font-size:12px;color:#888}
+.concept-body{font-size:14px;color:#444;line-height:1.8;margin-bottom:10px}
+.concept-connection{font-size:13px;color:#333;line-height:1.75;background:#f7f5f2;border-radius:8px;padding:10px 12px;margin-top:8px}
+.concept-connection::before{content:"自分との接続：";font-size:11px;font-weight:700;color:#BA7517;display:block;margin-bottom:4px;letter-spacing:.05em}
+
+/* タグ */
+.tag{font-size:11px;padding:2px 9px;border-radius:10px;font-weight:500}
+.c-amber{background:#FAEEDA;color:#BA7517}
+.c-purple{background:#EEEDFE;color:#3C3489}
+.c-blue{background:#E6F1FB;color:#0C447C}
+.c-green{background:#E1F5EE;color:#085041}
+.c-coral{background:#FAECE7;color:#712B13}
+.c-teal{background:#E1F5EE;color:#085041}
+
+/* テーブル */
+.table-wrap{overflow-x:auto;margin:14px 0}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{background:#f0ede8;padding:10px 14px;text-align:left;font-weight:600;color:#444;border-bottom:1px solid #e0ddd8;white-space:nowrap}
+td{padding:12px 14px;border-bottom:1px solid #eee;color:#333;line-height:1.7;vertical-align:top}
+tr:last-child td{border-bottom:none}
+
+/* まとめ（箇条書き） */
+.summary-list{background:#fff;border-radius:12px;padding:16px;border:1px solid #e8e5e0}
+.summary-list li{font-size:14px;color:#333;line-height:1.8;padding:5px 0 5px 18px;position:relative;border-bottom:1px solid #f2f0ed;list-style:none}
+.summary-list li:last-child{border-bottom:none}
+.summary-list li::before{content:"—";position:absolute;left:0;color:#EF9F27;font-weight:700}
+
+/* フッター引用 */
+.footer-quote{background:#FEFAF2;border-radius:14px;padding:20px;margin-top:8px;text-align:center;border:1px solid #f0e8d5}
+.footer-quote p{font-size:15px;color:#555;line-height:1.85;font-style:italic;margin:0}
+.footer-meta{font-size:12px;color:#BA7517;margin-top:10px;font-weight:600}
+
+/* 日付フッター */
+.doc-footer{margin-top:32px;padding-top:20px;border-top:1px solid #e0ddd8;font-size:12px;color:#aaa;text-align:center;line-height:1.8}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-back" href="../index.html">ホーム</a>
+  <span class="nav-divider">/</span>
+  <span class="nav-current">2026-04-18 対話記録</span>
+</nav>
+
+<header class="hdr">
+  <div class="hdr-inner">
+    <div class="hdr-label">対話の記録 · Dialogues</div>
+    <h1>持続の記録</h1>
+    <div class="hdr-meta">
+      <span class="tag c-amber">2026年4月18日</span>
+      <span class="tag c-blue">海士町</span>
+      <span class="tag c-purple">ベルクソン</span>
+      <span class="tag c-purple">ドゥルーズ</span>
+    </div>
+    <div class="hdr-theme">ベルクソンとドゥルーズを手がかりに、消えたいという感覚と向き合い、生きていく方法を探した対話の記録</div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- I -->
+  <div class="section">
+    <div class="section-num">Section I</div>
+    <div class="section-title">なぜ学ぶのか</div>
+
+    <div class="subsection">
+      <div class="subsection-title">答えではなく、手がかりが欲しい</div>
+      <p>死にたいというわけではない。ただ、消えてしまいたいと思うことは多くある。楽しいことはたくさんあるし、楽しいと感じる。でも苦しいことや悲しいことが周期的にやってきて、押しつぶされそうになる。数量的には楽しいことが多いはずなのに、質量が違う。苦しさの方がずっと重い。</p>
+      <p>だったら生きるより、苦しくなく消えられるならそちらの方が楽で幸せなのでは、という感覚。日々何かに頭を悩ませるのは疲れてしまう。</p>
+      <p>人に話せる人はいる。でも人なので、理解が難しい部分もある。だからこそ、哲学的に思考しようと考えた。答えじゃなくて手がかり的なものを見つけたい。それがベルクソンとドゥルーズを学ぼうとした理由。</p>
+      <div class="quote"><p>「手がかり的なものが見つかる、あるいは出会える気がする」</p></div>
+    </div>
+  </div>
+
+  <!-- II -->
+  <div class="section">
+    <div class="section-num">Section II</div>
+    <div class="section-title">何がわかったか</div>
+
+    <div class="subsection">
+      <div class="subsection-title">東京と、持続が置き去りにされた時間</div>
+      <p>苦しさが来るのは、何もないとき、突然に。帰り道とか、寝る前とか。そして振り返ってみると、ここ一年はその感覚がない。東京にいたときによく感じていた。忙しさに追われて、自分を蔑ろにしているときに感じていたのかもしれない。</p>
+      <p>ベルクソンの言葉で言えば、東京での生活は外から課される知性のテンポで動かされていた。仕事、役割、他人からの期待。そのテンポに合わせ続けることで、内側の持続——自分の流れる時間——が置き去りにされていた。帰り道や寝る前、外のテンポが止まった瞬間に、置き去りにされた自分が浮き上がってきた。</p>
+      <div class="quote"><p>「消えたい」という感覚は、存在そのものへの疲労ではなく、今の形・今の速度の自分への疲労だったかもしれない。固定された自分という形に、魂が収まりきっていない状態。</p></div>
+      <p>そして海士町には、自分で来た。その選択は重い。苦しい時期を経て、自分で動いた。ここ一年あの感覚がないのは、偶然ではない。外から課されるテンポが少ない場所で、自分の強度が自分のリズムで動けている。</p>
+    </div>
+  </div>
+
+  <!-- III -->
+  <div class="section">
+    <div class="section-num">Section III</div>
+    <div class="section-title">哲学との接続</div>
+    <div class="subsection">
+      <div class="subsection-title">ベルクソンとドゥルーズが名前をつけてくれたもの</div>
+
+      <div class="concept-card">
+        <div class="concept-header">
+          <span class="concept-name">持続 (durée)</span>
+          <span class="concept-author">— ベルクソン</span>
+          <span class="tag c-amber">ベルクソン</span>
+        </div>
+        <div class="concept-body">本当の時間とは、数で区切れるものではなく、流れ続ける質的なものだ。時計の一時間は常に同じ長さでも、楽しい一時間は短く、退屈な一時間は長い。ベルクソンはそれを誤りとは言わない。むしろそちらが本当の時間だと言う。</div>
+        <div class="concept-connection">苦しさの重さが楽しさと釣り合わないのは、密度が違うから。苦しさは凝縮・収縮した時間として体に刻まれる。数ではなく強度の問題。この感覚は正確で、おかしくない。</div>
+      </div>
+
+      <div class="concept-card">
+        <div class="concept-header">
+          <span class="concept-name">強度 (intensité)</span>
+          <span class="concept-author">— ドゥルーズ</span>
+          <span class="tag c-purple">ドゥルーズ</span>
+        </div>
+        <div class="concept-body">世界は差異と強度でできている。温度を例にすると、熱いか冷たいかという区別ではなく、熱から冷への移行そのもの、その差のエネルギーが強度。状態ではなく、変化の勢いのこと。強度は消えない。抑えると別の形で噴き出す。</div>
+        <div class="concept-connection">東京での苦しさは、外のテンポに合わせ続けることで内側の強度が圧縮されていた状態。帰り道に一気に解放されていたのは、その圧縮された強度だった。強度自体は善でも悪でもない。何に向かうかはまだ決まっていない。</div>
+      </div>
+
+      <div class="concept-card">
+        <div class="concept-header">
+          <span class="concept-name">逃走線 (ligne de fuite)</span>
+          <span class="concept-author">— ドゥルーズ</span>
+          <span class="tag c-purple">ドゥルーズ</span>
+        </div>
+        <div class="concept-body">逃げたいという衝動は、弱さや病ではない。既存の形・既存の自分から別の何かへ向かおうとする生命の動きだ。逃走線は消滅へではなく、変容へ向かうベクトル。</div>
+        <div class="concept-connection">「消えたい」という感覚の中に、今の自分ではない何かになりたいという力が眠っていたかもしれない。海士町を選んだこと自体、すでに逃走線の上にある。</div>
+      </div>
+
+      <div class="concept-card">
+        <div class="concept-header">
+          <span class="concept-name">リトルネロ (ritournelle)</span>
+          <span class="concept-author">— ドゥルーズ＆ガタリ</span>
+          <span class="tag c-purple">ドゥルーズ</span>
+          <span class="tag c-teal">ガタリ</span>
+        </div>
+        <div class="concept-body">子どもが暗闇で歌を口ずさむ。怖いからではなく、歌うことで自分の場所を作るために。小さな繰り返しのリズムが、自分の領域・自分のペースを生み出す。
+          <br><br>
+          三つの動き：
+          <ol style="margin:8px 0 0 18px;line-height:2">
+            <li>混沌の中に小さなリズムで場所を作る</li>
+            <li>そのリズムが繰り返されて自分の領域になる</li>
+            <li>その領域から外の世界へ向かっていく</li>
+          </ol>
+        </div>
+        <div class="concept-connection">気分でやる・やらないが決まってしまうのは意志の弱さではなく、まだリトルネロになっていないだけ。お香を炊く、紙に書く、Obsidianに移す——その繰り返しがリトルネロになる。書いた後にすっきりするという感覚が、内側がこれを必要としているというサインだ。</div>
+      </div>
+
+      <div class="concept-card">
+        <div class="concept-header">
+          <span class="concept-name">リゾーム (rhizome)</span>
+          <span class="concept-author">— ドゥルーズ＆ガタリ</span>
+          <span class="tag c-purple">ドゥルーズ</span>
+          <span class="tag c-teal">ガタリ</span>
+        </div>
+        <div class="concept-body">根っこが一本ではなく、どこからでも繋がり、どこからでも伸びていく構造。木のように中心から枝分かれするのではなく、地下茎のように縦横無尽に広がる。</div>
+        <div class="concept-connection">Obsidianでノート同士をリンクで繋げること自体がリゾームの実践。ベルクソンのメモと今日の日記が繋がる。ドゥルーズの概念と自分の体験が繋がる。思索がリゾーム状に育っていく。</div>
+      </div>
+
+      <div class="concept-card">
+        <div class="concept-header">
+          <span class="concept-name">生成変化 (devenir)</span>
+          <span class="concept-author">— ドゥルーズ</span>
+          <span class="tag c-purple">ドゥルーズ</span>
+        </div>
+        <div class="concept-body">強度の差異こそが生成変化を生む。変化するとは、Aという状態からBという状態になることではなく、AでもBでもない何かになっていく途中の過程にあること。</div>
+        <div class="concept-connection">「変容した」ということではなく、まだ変容の途中にいる。その途中にいること自体が、すでに手がかりに触れている。前向きな結論を出すより、途中にいることを正直に認めることの方が大切。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IV -->
+  <div class="section">
+    <div class="section-num">Section IV</div>
+    <div class="section-title">今の自分</div>
+
+    <div class="subsection">
+      <div class="subsection-title">負荷の種類を間違えないこと</div>
+      <p>今は楽しいし、心地よい。ただ負荷が足りない気がしている。でもそれが東京のような生活になることへの懸念もある。</p>
+      <p>ここで大事な問いがある。東京のときの負荷と、今欲しい負荷は同じ種類か。東京の負荷は外から課されたものだった。今足りないと感じているのは、内側から引っ張られるような負荷ではないか。義務ではなく抵抗感のある探索。消耗ではなく手応えのある摩擦。</p>
+      <p>仕事で知性的な負荷はある。足りないのは持続的な負荷——哲学、内省、日記、そして成果物を作ること。ただそれは気分任せで、モチベートされていない状態。</p>
+      <div class="quote"><p>書いた後の感覚は、一言で言えばすっきりして気分がいい。それが全てだ。頭が欲しがっているのではなく、内側が欲しがっている。</p></div>
+    </div>
+  </div>
+
+  <!-- V -->
+  <div class="section">
+    <div class="section-num">Section V</div>
+    <div class="section-title">どう生きるか</div>
+
+    <div class="subsection">
+      <div class="subsection-title">日々のリズム</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>時間</th>
+              <th>行動</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="tag c-purple" style="white-space:nowrap">夜 11:30</span></td>
+              <td>お香を炊く。スマホを裏返す。紙のノートに3行書く。</td>
+            </tr>
+            <tr>
+              <td><span class="tag c-amber" style="white-space:nowrap">朝 8:00</span></td>
+              <td>夜書いたものを読み返す。一文だけObsidianに移す。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>夜は感情や感覚に近い時間。流す感覚で書く。朝は少し俯瞰できる。夜の自分を、朝の自分が客観的に見る。その距離感が内省を深める。感覚と思考が一日のリズムの中で対話する。</p>
+      <p>最初の一週間は、続けることだけを目標にする。いいことを書こうとしない。深く考えようとしない。お香を炊いて、何か書いた。それで100点。</p>
+      <p>3ヶ月書き続けた先に、自分でも気づいていなかったテーマが浮き上がってくる。それが成果物の種になる。成果物は今は気にしなくていい。</p>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">ツールの流れ</div>
+      <div class="concept-card" style="background:#f9f7f4">
+        <div style="font-size:14px;color:#444;line-height:2;text-align:center;font-weight:500">
+          紙のノート <span style="color:#EF9F27">（書く・流す）</span>
+          <span style="margin:0 8px;color:#ccc">→</span>
+          Obsidian <span style="color:#7F77DD">（蓄積・リゾーム）</span>
+          <span style="margin:0 8px;color:#ccc">→</span>
+          GitHub <span style="color:#22c55e">（保存・消えない安心）</span>
+        </div>
+      </div>
+      <p style="margin-top:12px">断片は紙から移した一文を放り込む場所。ノート同士をリンクで繋げることがリゾームになる。</p>
+    </div>
+  </div>
+
+  <!-- VI -->
+  <div class="section">
+    <div class="section-num">Section VI</div>
+    <div class="section-title">手がかり</div>
+
+    <div class="subsection">
+      <div class="subsection-title">途中にいることが、すでに触れているということ</div>
+      <p>最初に「答えではなく手がかりが欲しい」と言っていた。それは正確だった。そして今、その手がかりはもうすでに触れている。</p>
+
+      <ul class="summary-list" style="margin-top:14px">
+        <li>「消えたい」は存在への否定ではない</li>
+        <li>苦しさの重さは密度の違い</li>
+        <li>書いた後のすっきりを信頼する</li>
+        <li>今の自分は変容の途中にいる</li>
+        <li>海士町を自分で選んだことは正しかった</li>
+        <li>内側から来る負荷を育てる</li>
+        <li>前向きな結論より途中を生きる</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-quote">
+    <p>手がかりはまだ途中にある。でも途中にいること自体が、すでに手がかりに触れている。</p>
+    <div class="footer-meta">2026年4月18日 · 海士町</div>
+  </div>
+
+  <div class="doc-footer">
+    この対話は2026年4月18日、海士町で行われた。<br>
+    ベルクソンを学び始めたばかりの、変容の途中にいる人の記録。<br>
+    すっきりするという感覚を信頼しながら、お香と紙とObsidianで、自分の持続を育てていく。
+  </div>
+
+</div>
+</body>
+</html>
